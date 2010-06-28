@@ -1,0 +1,102 @@
+\documentclass[pre,twocolumn,showpacs,superscriptaddress,preprintnumbers,floatfix]{revtex4}
+
+\usepackage{etex}
+\usepackage{ifpdf}
+\usepackage{hyperref}
+\usepackage{dcolumn}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amscd}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{bm}   % bold math
+\usepackage{bbm}   
+\usepackage{verbatim}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{setspace}
+
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+\else
+  \usepackage[dvips]{graphicx}
+\fi
+
+\theoremstyle{plain}	\newtheorem{Lem}{Lemma}
+\theoremstyle{plain}	\newtheorem*{ProLem}{Proof}
+\theoremstyle{plain} 	\newtheorem{Cor}{Corollary}
+\theoremstyle{plain} 	\newtheorem*{ProCor}{Proof}
+\theoremstyle{plain} 	\newtheorem{The}{Theorem}
+\theoremstyle{plain} 	\newtheorem*{ProThe}{Proof}
+\theoremstyle{plain} 	\newtheorem{Prop}{Proposition}
+\theoremstyle{plain} 	\newtheorem*{ProProp}{Proof}
+\theoremstyle{plain} 	\newtheorem*{Conj}{Conjecture}
+\theoremstyle{plain}	\newtheorem*{Rem}{Remark}
+\theoremstyle{plain}	\newtheorem{Def}{Definition} 
+\theoremstyle{plain}	\newtheorem*{Not}{Notation}
+
+\input{cmechabbrev}
+
+%\addtolength{\abovedisplayskip}{-.05in}
+%\addtolength{\belowdisplayskip}{-.05in}
+%\addtolength{\dbltextfloatsep}{-.10in}
+%\addtolength{\abovecaptionskip}{-.10in}
+%\addtolength{\belowcaptionskip}{-.10in}
+\parskip 0pt
+
+\newcommand{\alert}[1]{\textbf{\textcolor{red}{#1}}}
+
+\begin{document}
+
+\title{The Title}
+\author{Author}
+\email{email}
+\affiliation{Complexity Sciences Center and Physics Department,
+University of California at Davis, One Shields Avenue, Davis, CA 95616}
+\date{\today}
+\bibliographystyle{unsrt}
+
+% ************************* ABSTRACT *************************
+\begin{abstract}
+ABSTRACT
+\vspace{0.1in}
+\noindent
+{\bf Keywords}: controllability, synchronization information, stored
+information, entropy rate, statistical complexity, excess entropy,
+crypticity, information diagram, presentation, minimality
+
+\end{abstract}
+
+\pacs{
+02.50.-r  %  Probability theory, stochastic processes, and statistics
+89.70.+c  %  Information science 
+05.45.Tp  %  Time series analysis
+02.50.Ey  %  Stochastic processes 
+02.50.Ga  %  Markov processes 
+% 05.20.-y  %  Classical statistical mechanics
+% 05.45.-a  %  Nonlinear dynamics and nonlinear dynamical systems
+% 89.75.Kd  %  Complex Systems: Patterns 
+}
+%
+\preprint{Santa Fe Institute Working Paper 10-06-XXX}
+\preprint{arxiv.org:1006.XXXX [physics.gen-ph]}
+
+\maketitle
+\
+% ****************************************************************
+
+\tableofcontents
+\setstretch{1.1}
+
+Here is text. \alert{Here is commentary for writers.}
+
+\section*{Acknowledgments}
+
+Ack
+
+\bibliography{ref,chaos}
+
+\end{document}
+
+

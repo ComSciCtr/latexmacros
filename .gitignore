@@ -1,0 +1,24 @@
+# latex
+*.aux
+*.blg
+*.dvi
+*.end
+*.log
+*.out
+*.ps
+*.tex~
+*.bbl
+*.nav
+*.snm
+*.toc
+*.vrb
+
+
+# python
+*.pyc
+*.pyo
+
+# Backup files for gedit
+*~
+
+
