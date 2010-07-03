@@ -304,14 +304,47 @@
 %%
 %% The optional argument specifies the start time, defaulting to t=0.
 %% The mandatory argument specifies the length of the block (not the stop time).
-\newcommand{\BE}[2][0]{\ensuremath{H[\MeasSymbol_{#1}^{#2}]}}
-\newcommand{\BSE}[2][0]{\ensuremath{H[\MeasSymbol_{#1}^{#2},\CausalState_{#2}]}}
-\newcommand{\SBE}[2][0]{\ensuremath{H[\CausalState_{#1},\MeasSymbol_{#1}^{#2}]}}
-\newcommand{\SBSE}[2][0]{\ensuremath{H[\CausalState_{#1},\MeasSymbol_{#1}^{#2}, \CausalState_{#2}]}}
-\newcommand{\AltSBE}[2][0]{\ensuremath{H[\AlternateState_{#1},\MeasSymbol_{#1}^{#2}]}}
-\newcommand{\AltBSE}[2][0]{\ensuremath{H[\MeasSymbol_{#1}^{#2},\AlternateState_{#2}]}}
-\newcommand{\AltSBSE}[2][0]{\ensuremath{H[\AlternateState_{#1},\MeasSymbol_{#1}^{#2}, \AlternateState_{#2}]}}
-
+\newcommand{\lastindex}[2]{
+  \edef\tempa{0}
+  \edef\tempb{#2}
+  \ifx\tempa\tempb
+    % if the length is 0, then the final time equals the start time
+    \edef\tempc{#1}
+  \else
+    % if the start time is different from zero, then we show the sum
+    \edef\tempa{0}
+    \edef\tempb{#1}
+    \ifx\tempa\tempb
+      \edef\tempc{#2}
+    \else
+      \edef\tempc{#1+#2}
+    \fi
+  \fi
+  \tempc
+}
+\newcommand{\BE}[2][0]{
+  \ensuremath{H[\MeasSymbol_{#1}^{#2}]}
+}
+\newcommand{\BSE}[2][0]{
+  \ensuremath{H[\MeasSymbol_{#1}^{#2},\CausalState_{\lastindex{#1}{#2}}]}%
+}
+\newcommand{\SBE}[2][0]{
+  \ensuremath{H[\CausalState_{#1},\MeasSymbol_{#1}^{#2}]}
+}
+\newcommand{\SBSE}[2][0]{
+  \ensuremath{H[\CausalState_{#1},\MeasSymbol_{#1}^{#2},
+                \CausalState_{\lastindex{#1}{#2}}]}
+}
+\newcommand{\AltSBE}[2][0]{
+  \ensuremath{H[\AlternateState_{#1},\MeasSymbol_{#1}^{#2}]}
+}
+\newcommand{\AltBSE}[2][0]{
+  \ensuremath{H[\MeasSymbol_{#1}^{#2},\AlternateState_{\lastindex{#1}{#2}}]}
+}
+\newcommand{\AltSBSE}[2][0]{
+  \ensuremath{H[\AlternateState_{#1},\MeasSymbol_{#1}^{#2},
+                \AlternateState_{\lastindex{#1}{#2}}]}
+}
 
 \newcommand{\GI}{\varphi}
 \newcommand{\OI}{\zeta}
