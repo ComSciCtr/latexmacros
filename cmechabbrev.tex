@@ -192,14 +192,14 @@
 \newcommand{\STRegion}			{ {\mathrm K}}
 \newcommand{\STRegionVariable}		{ K}
 \newcommand{\stregionvariable}		{ k}
-\newcommand{\GlobalPast}		{ \overleftarrow{G}} 
-\newcommand{\globalpast}		{ \overleftarrow{g}} 
+\newcommand{\GlobalPast}		{ \overleftarrow{G}}
+\newcommand{\globalpast}		{ \overleftarrow{g}}
 \newcommand{\GlobalFuture}		{ \overrightarrow{G}}
 \newcommand{\globalfuture}		{ \overrightarrow{g}}
 \newcommand{\GlobalState}		{ \mathcal{G}}
 \newcommand{\globalstate}		{ \gamma}
 \newcommand{\GlobalStateSet}		{ {\mathbf \GlobalState}}
-\newcommand{\LocalPast}			{ \overleftarrow{L}} 
+\newcommand{\LocalPast}			{ \overleftarrow{L}}
 \newcommand{\localpast}			{ \overleftarrow{l}}
 \newcommand{\AllLocalPasts}		{ \mathbf{\LocalPast}}
 \newcommand{\LocalPastRegion}		{ \overleftarrow{\mathrm L}}
@@ -384,24 +384,23 @@
 
 
 %% (cje)
-%% Provide a command \ifpm which is true when \pm 
+%% Provide a command \ifpm which is true when \pm
 %% is meant to be understood as "+ or -", opposed
-%% to "bidirectional". This differs from the usage 
+%% to "bidirectional". This differs from the usage
 %% in TBA.  Essentially, if \forwardreverse is defined
 %% as something different, perhaps a \diamond, then
 %% we are free to interpret \pm as "+ or -".
-\newif\ifpm 
+\newif\ifpm
 \edef\tempa{\forwardreverse}
 \edef\tempb{\pm}
 \ifx\tempa\tempb
    \pmfalse
 \else
-   \pmtrue  
+   \pmtrue
 \fi
 
 %% Macros for krorder
 \newcommand{\MeasSymbols}[2] {\MeasSymbol_{#1:#2}}
 \newcommand{\Lsync} {\mathcal{L}_{\mathrm{sync}}}
-
 
 
