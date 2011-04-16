@@ -383,6 +383,18 @@
       \ensuremath{\FutureCausalState#1\PastCausalState}
    \fi
 }
+\newcommand{\CSjointKL}[3][,]{
+   \edef\tempa{:}
+   \edef\tempb{#1}
+   \ifx\tempa\tempb
+      % arg1 was a colon, insert a small negative space
+      \ensuremath{\FutureCausalState_{#2}\!#1\PastCausalState_{#3}}
+   \else
+      % arg1 was not a colon, usually a comma or semicolon
+      \ensuremath{\FutureCausalState_{#2}#1\PastCausalState_{#3}}
+   \fi
+}
+
 
 %% (cje)
 %% Provide a command \ifpm which is true when \pm
@@ -400,5 +412,8 @@
    \pmtrue
 \fi
 
+%% Macros for krorder
+\newcommand{\MeasSymbols}[2] {\MeasSymbol_{#1:#2}}
+\newcommand{\Lsync} {\mathcal{L}_{\mathrm{sync}}}
 
 
