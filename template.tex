@@ -1,6 +1,6 @@
 % stuff
 
-\documentclass[prl,twocolumn,showpacs,superscriptaddress,preprintnumbers,floatfix]{revtex4-1}
+\documentclass[twocolumn,showpacs,superscriptaddress,preprintnumbers,floatfix]{revtex4-1}
 
 % ******************************************************************************
 %%% Imports and configuration
@@ -18,6 +18,8 @@
 \usepackage{amsthm}                      %
 \usepackage{bm}                          %
 \usepackage{bbm}                         %
+\usepackage{mathtools}                   %
+\usepackage{etoolbox}                    %
 \usepackage{verbatim}                    %
 \usepackage{stmaryrd}                    %
 \usepackage{xcolor}                      %
@@ -27,6 +29,10 @@
 \usepackage{cleveref}                    % Automatically label references
 \usepackage{booktabs}                    % Nicer tables
 \usepackage[caption=false]{subfig}       % Subfigures
+\usepackage[T1]{fontenc}                 % Allow copy/paste of unicode
+\usepackage{lmodern}                     % Nicer looking font
+\usepackage[scaled=0.72]{beramono}       % More nicer fonts
+\usepackage{microtype}                   % Nicer fonts too
 
 %% Various TikZ related imports
 \usepackage{tikz}
@@ -316,6 +322,7 @@ This is an introduction. See \cref{fig:even_process} for more information.
     % added for symmetry
     \path (B) edge [loop right, draw=none] node {} (B);
   \end{tikzpicture}
+  \caption{The \eM of the Even process.}
   \label{fig:even_process}
 \end{figure}
 
