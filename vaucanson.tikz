@@ -59,12 +59,11 @@
 \makeatother
 
 \providecommand{\Symbol}[1]{\textcolor{blue}{#1}}
-\providecommand{\Edge}[2]{\Symbol{#1} : #2}
+\providecommand{\Edge}[2]{\Symbol{#1}\!:\!#2}
+\providecommand{\TEdge}[3]{\Symbol{#1}|\Symbol{#2}\!:\!#3}
 
 \definecolor{FCSA}{RGB}{141,211,199}
 \definecolor{FCSB}{RGB}{255,255,179}
 \definecolor{RCSC}{RGB}{185,138,196}
 \definecolor{RCSD}{RGB}{231,143,111}
 \definecolor{RCSE}{RGB}{128,177,211}
-
-

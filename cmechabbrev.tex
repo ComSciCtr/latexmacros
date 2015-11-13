@@ -86,7 +86,7 @@
 \newcommand{\hmu}               {h_\mu}
 \newcommand{\EE}                {{\bf E}}
 \newcommand{\TI}                {{\bf T}}
-\newcommand{\SI}        {{\bf S}}
+\newcommand{\SyncI}        {{\bf S}}
 \newcommand{\Measurable}{{\bf \mu}}
 
 % Process Crypticity
@@ -398,8 +398,8 @@
 \fi
 
 
-% ******************************************************************************
-% Metric quantities of information generation:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Metric quantities of information generation, eg anatomy of a bit
 
 \newcommand{\metric}[1] {\ensuremath{#1_\mu}\xspace}
 
@@ -413,7 +413,7 @@
 \newcommand{\sigmamu}{\metric{\sigma}}
 
 \newcommand{\himc}{\ensuremath{h_{imc}}\xspace}
-\newcommand{\pee}{\ensuremath{pee}\xspace}
+\newcommand{\pee}{\ensuremath{pee}\xspace} % parallel edge entropy
 
 \newcommand{\ExE}[1] {\ensuremath{\EE_{#1}}\xspace}
 
@@ -424,8 +424,8 @@
 \newcommand{\EI}{\mathbf{I}}
 
 
-% ******************************************************************************
-% Time series:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Time series, using the python-esque notation
 
 \newcommand{\MS} [2] {\ensuremath{\MeasSymbol_{#1:#2}}\xspace}
 \newcommand{\ms} [2] {\ensuremath{\meassymbol_{#1:#2}}\xspace}
@@ -443,35 +443,13 @@
 \newcommand{\lfuture}  [1] {\ms{#1}{}}
 
 
-% ******************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Causal states
 
 \newcommand{\FCS}{\CausalState^\forward\xspace}
 \newcommand{\RCS}{\CausalState^\reverse\xspace}
 
-
-% ******************************************************************************
-% Information theory macros
-
-\newcommand{\op}  [2]   {\ensuremath{\operatorname{#1}\left[#2\right]}\xspace}
-
-\renewcommand{\H} [1]   {\op{H}{#1}}
-\newcommand{\I}   [1]   {\op{I}{#1}}
-\newcommand{\T}   [1]   {\op{T}{#1}}
-\newcommand{\R}   [1]   {\op{R}{#1}}
-\newcommand{\B}   [1]   {\op{B}{#1}}
-\newcommand{\K}   [1]   {\op{K}{#1}}
-
-% operators on random variables
-
-\newcommand{\meet}      {\curlywedge}
-\newcommand{\join}      {\curlyvee}
-\newcommand{\iless}     {\preceq}
-\newcommand{\imore}     {\succeq}
-\newcommand{\ieq}       {\cong}
-\newcommand{\mss}       {\downrightarrow}
-
-% ******************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Others
 
 \newcommand{\half}{\ensuremath{\nicefrac{1}{2}}}
@@ -479,8 +457,8 @@
 \newcommand{\Language} {\ensuremath{\mathcal{L}}\xspace}
 \newcommand{\Lsync} {\Language_{\mathrm{sync}}\xspace}
 
-% ******************************************************************************
-% mathclap
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% mathclap, in case someone doesn't have mathtools
 
 % TUGboat, Volume 0 (2001), No. 0
 % http://math.arizona.edu/~aprl/publications/mathclap/perlis_mathclap_24Jun2003.pdf
