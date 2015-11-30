@@ -1,6 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Information theory macros
 
+\def \mid {~\middle|~}
+
 % functions
 \newcommand{\op}  [2]   {\ensuremath{\operatorname{#1}\left[#2\right]}\xspace}
 
@@ -10,6 +12,9 @@
 \newcommand{\R}   [1]   {\op{R}{#1}}
 \newcommand{\B}   [1]   {\op{B}{#1}}
 \newcommand{\K}   [1]   {\op{K}{#1}}
+
+\newcommand{\TE}  [2]   {\ensuremath{\operatorname{T}_{#1\rightarrow#2}}\xspace}
+\newcommand{\CE}  [3]   {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
 
 % operators on random variables
 \newcommand{\meet}      {\curlywedge}

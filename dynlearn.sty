@@ -18,14 +18,14 @@
 \usepackage{setspace}                    %
 
 % figures
-\usepackage{graphicx}                    %
+\usepackage[final]{graphicx}             %
 \usepackage[caption=false]{subfig}       % subfigures; caption and subcaption
                                          % are incompatible with revtex4.1
 
 % formatting of particular things
 \usepackage[final,pagebackref]{hyperref} %
 \usepackage[capitalise]{cleveref}        % Automatically label references
-\usepackage{url}                         %
+\usepackage{url}                         % format URLs
 \usepackage[super]{nth}                  % 1st, 2nd, etc
 \usepackage{contour}                     % draw an outline around text
 \usepackage[abbreviations]{foreign}      % \ie, \eg.
@@ -60,6 +60,37 @@
 \usepackage{booktabs}                    % nicer tables
 \usepackage{dcolumn}                     % align by decimal in tables
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fixme: put todos and such in the document
+
+\usepackage[inline,nomargin,author=]{fixme}
+
+\makeatletter
+\def\@lox@prtc{\section*{\@fxlistfixmename}\begingroup\def\@dotsep{4.5}}
+\def\@lox@psttc{\endgroup}
+\makeatother
+
+\fxsetup{theme=color,mode=multiuser}
+\fxsetface{inline}{\bfseries}
+
+% different authors
+\definecolor{ryan}{RGB}{64, 0, 128}
+
+\FXRegisterAuthor{jpc}{ajpc}{JPC}
+\FXRegisterAuthor{rgj}{argj}{\color{ryan}RGJ}
+\FXRegisterAuthor{jrm}{ajrm}{JRM}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% cmvec setup
+
+\usepackage{cmvec}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% epigraph setup
+
+\usepackage{epigraph}
+
+\renewcommand{\epigraphflush}{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TikZ related imports
@@ -76,11 +107,13 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{through}
 
+\pgfkeys{/pgf/images/include external/.code=\includegraphics{#1}}
+
 %% Externalization of TikZ images
 % Uncomment to enable:
 
-% \tikzexternalize
-% \tikzsetexternalprefix{images/}
+\tikzexternalize
+\tikzsetexternalprefix{images/}
 
 %% e-Machine style and supporting code
 \input{vaucanson.tikz}
@@ -178,13 +211,14 @@ morekeywords={as},                      % Additional keywords
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Uncomment to list package versions:
+
 % \listfiles
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document configuration
 
 \setlength{\parindent}{0pt}
-\newcommand{\alert}[1]{\textbf{\textcolor{red}{#1}}}
+\setlength{\parskip}{3pt plus 2pt minus 2pt}
 
 \hypersetup{
   colorlinks,
