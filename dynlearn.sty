@@ -14,6 +14,7 @@
 \usepackage{etex}                        %
 \usepackage{ifpdf}                       % write flexible commands
 \usepackage{xspace}                      % let macros play nice with spaces
+\usepackage{xpunctuate}                  % like xspace, but for punctuation
 \usepackage{xcolor}                      % colors
 \usepackage{setspace}                    %
 
@@ -28,7 +29,6 @@
 \usepackage{url}                         % format URLs
 \usepackage[super]{nth}                  % 1st, 2nd, etc
 \usepackage{contour}                     % draw an outline around text
-\usepackage[abbreviations]{foreign}      % \ie, \eg.
 \usepackage{verbatim}                    %
 
 % math formating, fonts, and symbols
@@ -81,9 +81,16 @@
 \FXRegisterAuthor{jrm}{ajrm}{JRM}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% foreign stuff, stolen from (and not included because of build systems)
+% \usepackage[abbreviations]{foreign}
+
+\DeclareRobustCommand\eg{\xperiodcommaafter{\textit{e.g}}}
+\DeclareRobustCommand\ie{\xperiodcommaafter{\textit{i.e}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cmvec setup
 
-\usepackage{cmvec}
+% \usepackage{cmvec}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % epigraph setup
@@ -112,8 +119,8 @@
 %% Externalization of TikZ images
 % Uncomment to enable:
 
-% \tikzexternalize
-\tikzsetexternalprefix{images/}
+\tikzexternalize
+\tikzsetexternalprefix{tikz_cache/}
 
 %% e-Machine style and supporting code
 \input{vaucanson.tikz}
