@@ -67,23 +67,22 @@ def publish(tex, inline):
     """
     This command performs several operations:
 
-     -[X] Produce a `publish` directory with tex files copied over
+    - Produce a `publish` directory with tex files copied over
 
-     -[X] Factor out tikz code
+    - Factor out tikz code
 
-     -[X] Rename images to figure-n.pdf and place them alongside the tex
+    - Rename images to figure-n.pdf and place them alongside the tex
 
-     -[X] Factors out cref
+    - Factors out cref
 
-     -[X] Produces the .bbl file
+    - Produces the .bbl file
 
-     -[ ] Inlines all macros (optional)
+    - Ensure status is `final`
 
-     -[ ] Ensure status is `final`
+    - Remove `fixme` notes
 
-     -[X] Remove `fixme` notes
+    - Remove unneeded files
 
-     -[X] Remove unneeded files
     """
     if len(tex.split('.')) < 2:
         tex += '.tex'
@@ -102,6 +101,9 @@ def publish(tex, inline):
 
     LOG.info('Removing fixmes')
     remove_notes(tex, pdir)
+
+    LOG.info('Making document final')
+    make_final(tex, pdir)
 
     LOG.info('Compiling document')
     compile_tex(tex, pdir)
@@ -317,6 +319,20 @@ def remove_notes(tex, cwd):
         r'\\FXRegisterAuthor\{.*\}',
     ]
     comment_lines(sty_file, fx_regexs)
+
+
+def make_final(tex, cwd):
+    """
+    """
+    regex = r'(\\documentclass\[.*)(draft)(.*)'
+
+    with open("{}/{}".format(cwd, tex)) as source:
+        source = source.read()
+
+    source = re.sub(regex, r'\g<1>final\g<3>', source)
+
+    with open("{}/{}".format(cwd, tex), 'w') as output:
+        output.write(source)
 
 
 def find_authors(sty_file):
