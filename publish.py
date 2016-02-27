@@ -149,6 +149,19 @@ def find_bib_files(tex):
 def remove_tikz(tex, cwd):
     """
     """
+    # find tikz cache directory
+    sty_file = cwd+'/dynlearn.sty'
+
+    tikz_prefix_regex = r'\\tikzsetexternalprefix\{(?P<tikz>.*)\}'
+    with open(sty_file) as dynlearn:
+        tikz_dir = re.search(tikz_prefix_regex, dynlearn.read())
+    tikz_dir = tikz_dir.groupdict()['tikz']
+
+    # ensure that the externalize directory exists
+    tikz_dir_path = pathlib.Path(tikz_dir)
+    if not tikz_dir_path.exists():
+        tikz_dir_path.mkdir()
+        
     # ensure that externalize is on
     dynlearn_fn = str(pathlib.Path().cwd() / 'dynlearn.sty')
 
@@ -162,14 +175,6 @@ def remove_tikz(tex, cwd):
 
     # generate images
     compile_tex(tex, str(pathlib.Path().cwd()))
-
-    # find tikz cache directory
-    sty_file = cwd+'/dynlearn.sty'
-
-    tikz_prefix_regex = r'\\tikzsetexternalprefix\{(?P<tikz>.*)\}'
-    with open(sty_file) as dynlearn:
-        tikz_dir = re.search(tikz_prefix_regex, dynlearn.read())
-    tikz_dir = tikz_dir.groupdict()['tikz']
 
     # replace tikzpictures with includegraphics
     def fig_name_gen():
