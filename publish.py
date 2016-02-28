@@ -120,14 +120,14 @@ def create_and_populate(tex):
 
     if pdir.exists():
         LOG.warn('Removing existing {} directory'.format(DIRECTORY_NAME))
-        cmd = "rm -rf {}".format(DIRECTORY_NAME)
+        cmd = sarge.shell_format("rm -rf {0}", DIRECTORY_NAME)
         sarge.run(cmd, cwd=str(cwd))
 
     pdir.mkdir()
 
     files = TEMPLATE_FILES + find_bib_files(tex) + [tex]
     for filename in files:
-        cmd = "cp {} {}".format(filename, DIRECTORY_NAME)
+        cmd = sarge.shell_format("cp {0} {1}", filename, DIRECTORY_NAME)
         sarge.run(cmd, cwd=str(cwd))
 
     return str(pdir)
@@ -161,7 +161,7 @@ def remove_tikz(tex, cwd):
     tikz_dir_path = pathlib.Path(tikz_dir)
     if not tikz_dir_path.exists():
         tikz_dir_path.mkdir()
-        
+
     # ensure that externalize is on
     dynlearn_fn = str(pathlib.Path().cwd() / 'dynlearn.sty')
 
@@ -230,7 +230,8 @@ def copy_and_rename_figures(tex, dest_dir):
 
             to_path = "{}/{}".format(dest_dir, new_file_name)
 
-            cmd = "cp {} {}".format(file_path, to_path)
+            cmd = sarge.shell_format("cp {0} {1}", file_path, to_path)
+
             sarge.run(cmd)
 
             i += 1
@@ -288,9 +289,9 @@ def remove_cref(tex, cwd):
     # generate and run the sed script
     compile_tex(tex, cwd)
 
-    sed_cmd = "sed -f {0}.sed {0}.tex > {0}.tex.temp".format(tex.split('.')[0])
+    sed_cmd = sarge.shell_format("sed -f {0}.sed {0}.tex > {0}.tex.temp", tex.split('.')[0])
     sarge.run(sed_cmd, cwd=cwd)
-    sarge.run("mv {0}.temp {0}".format(tex), cwd=cwd)
+    sarge.run(sarge.shell_format("mv {0}.temp {0}", tex), cwd=cwd)
 
     # remove the cleveref import
     cref_regex3 = r'\\usepackage\[.*\]\{cleveref\}'
