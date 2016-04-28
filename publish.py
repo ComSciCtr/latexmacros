@@ -38,6 +38,7 @@ TEMPLATE_FILES = [
 
 UNWANTED_EXTENSIONS = [
     'aux',
+    'bbl',
     'bib',
     'blg',
     'brf',
@@ -69,6 +70,8 @@ def publish(tex, inline):
 
     - Produce a `publish` directory with tex files copied over
 
+    - Remove comments
+
     - Factor out tikz code
 
     - Rename images to figure-n.pdf and place them alongside the tex
@@ -81,6 +84,8 @@ def publish(tex, inline):
 
     - Remove `fixme` notes
 
+    - Inline the bbl file
+
     - Remove unneeded files
 
     """
@@ -89,6 +94,9 @@ def publish(tex, inline):
 
     LOG.info('Creating publication version of {}'.format(tex))
     pdir = create_and_populate(tex)
+
+    LOG.info('Removing comments')
+    remove_comments(tex, pdir)
 
     LOG.info('Removing TikZ dependency')
     remove_tikz(tex, pdir)
@@ -105,8 +113,11 @@ def publish(tex, inline):
     LOG.info('Making document final')
     make_final(tex, pdir)
 
+    LOG.info('Inlining the bbl file')
+    inline_bbl(tex, pdir)
+
     LOG.info('Compiling document')
-    compile_tex(tex, pdir)
+    compile_tex(tex, pdir, bibtex=False)
 
     LOG.info('Cleaning directory')
     clean_directory(pdir)
@@ -120,14 +131,14 @@ def create_and_populate(tex):
 
     if pdir.exists():
         LOG.warn('Removing existing {} directory'.format(DIRECTORY_NAME))
-        cmd = "rm -rf {}".format(DIRECTORY_NAME)
+        cmd = sarge.shell_format("rm -rf {0}", DIRECTORY_NAME)
         sarge.run(cmd, cwd=str(cwd))
 
     pdir.mkdir()
 
     files = TEMPLATE_FILES + find_bib_files(tex) + [tex]
     for filename in files:
-        cmd = "cp {} {}".format(filename, DIRECTORY_NAME)
+        cmd = sarge.shell_format("cp {0} {1}", filename, DIRECTORY_NAME)
         sarge.run(cmd, cwd=str(cwd))
 
     return str(pdir)
@@ -146,9 +157,35 @@ def find_bib_files(tex):
     return bib_files
 
 
+def remove_comments(tex, cwd):
+    """
+    """
+    comment_regex = r'%.*'
+    with open("{}/{}".format(cwd, tex)) as source:
+        source = source.read()
+
+    source = re.sub(comment_regex, '%', source)
+
+    with open("{}/{}".format(cwd, tex), 'w') as output:
+        output.write(source)
+
+
 def remove_tikz(tex, cwd):
     """
     """
+    # find tikz cache directory
+    sty_file = cwd+'/dynlearn.sty'
+
+    tikz_prefix_regex = r'\\tikzsetexternalprefix\{(?P<tikz>.*)\}'
+    with open(sty_file) as dynlearn:
+        tikz_dir = re.search(tikz_prefix_regex, dynlearn.read())
+    tikz_dir = tikz_dir.groupdict()['tikz']
+
+    # ensure that the externalize directory exists
+    tikz_dir_path = pathlib.Path(tikz_dir)
+    if not tikz_dir_path.exists():
+        tikz_dir_path.mkdir()
+
     # ensure that externalize is on
     dynlearn_fn = str(pathlib.Path().cwd() / 'dynlearn.sty')
 
@@ -162,14 +199,6 @@ def remove_tikz(tex, cwd):
 
     # generate images
     compile_tex(tex, str(pathlib.Path().cwd()))
-
-    # find tikz cache directory
-    sty_file = cwd+'/dynlearn.sty'
-
-    tikz_prefix_regex = r'\\tikzsetexternalprefix\{(?P<tikz>.*)\}'
-    with open(sty_file) as dynlearn:
-        tikz_dir = re.search(tikz_prefix_regex, dynlearn.read())
-    tikz_dir = tikz_dir.groupdict()['tikz']
 
     # replace tikzpictures with includegraphics
     def fig_name_gen():
@@ -225,7 +254,8 @@ def copy_and_rename_figures(tex, dest_dir):
 
             to_path = "{}/{}".format(dest_dir, new_file_name)
 
-            cmd = "cp {} {}".format(file_path, to_path)
+            cmd = sarge.shell_format("cp {0} {1}", file_path, to_path)
+
             sarge.run(cmd)
 
             i += 1
@@ -283,9 +313,9 @@ def remove_cref(tex, cwd):
     # generate and run the sed script
     compile_tex(tex, cwd)
 
-    sed_cmd = "sed -f {0}.sed {0}.tex > {0}.tex.temp".format(tex.split('.')[0])
+    sed_cmd = sarge.shell_format("sed -f {0}.sed {0}.tex > {0}.tex.temp", tex.split('.')[0])
     sarge.run(sed_cmd, cwd=cwd)
-    sarge.run("mv {0}.temp {0}".format(tex), cwd=cwd)
+    sarge.run(sarge.shell_format("mv {0}.temp {0}", tex), cwd=cwd)
 
     # remove the cleveref import
     cref_regex3 = r'\\usepackage\[.*\]\{cleveref\}'
@@ -335,6 +365,28 @@ def make_final(tex, cwd):
         output.write(source)
 
 
+def inline_bbl(tex, cwd):
+    """
+    """
+    regex = re.compile(r'\\bibliography\{.*?\}')
+
+
+    with open("{}/{}.bbl".format(cwd, tex.split('.')[0])) as bbl:
+        bbl = bbl.readlines()
+
+    with open("{}/{}".format(cwd, tex)) as source:
+        source = source.readlines()
+
+    bib = [ i for i, line in enumerate(source) if regex.match(line) ]
+
+    if bib:
+        source = source[:bib[0]] + bbl + source[bib[0]+1:]
+
+        with open("{}/{}".format(cwd, tex), 'w') as output:
+            output.writelines(source)
+
+
+
 def find_authors(sty_file):
     """
     """
@@ -361,13 +413,15 @@ def comment_lines(filename, regexs):
         output.write(source)
 
 
-def compile_tex(tex, cwd):
+def compile_tex(tex, cwd, bibtex=True):
     """
     """
     pdflatex = "pdflatex --shell-escape {}".format(tex)
     bibtex = "bibtex {}".format(tex.split('.')[0])
 
-    cmds = [pdflatex, bibtex, pdflatex, pdflatex]
+    cmds = [pdflatex, pdflatex]
+    if bibtex:
+        cmds = [pdflatex, bibtex] + cmds
 
     for cmd in cmds:
         sarge.capture_both(cmd, cwd=cwd)
