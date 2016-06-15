@@ -6,15 +6,40 @@
 % functions
 \newcommand{\op}  [2]   {\ensuremath{\operatorname{#1}\left[#2\right]}\xspace}
 
-\renewcommand{\H} [1]   {\op{H}{#1}}
-\newcommand{\I}   [1]   {\op{I}{#1}}
-\newcommand{\T}   [1]   {\op{T}{#1}}
-\newcommand{\R}   [1]   {\op{R}{#1}}
-\newcommand{\B}   [1]   {\op{B}{#1}}
-\newcommand{\K}   [1]   {\op{K}{#1}}
+% entropies
+\renewcommand{\H}  [1]          {\op{H}{#1}}
+\newcommand{\R}    [1]          {\op{R}{#1}}
+\newcommand{\RyE}  [2] [\alpha] {\op{H_{#1}}{#2}}
+\newcommand{\TsE}  [2] [q]      {\op{S_{#1}}{#2}}
+\newcommand{\CRE}  [1]          {\op{\mathcal{E}}{#1}}
+\newcommand{\GCRE} [1]          {\op{\mathcal{E^\prime}}{#1}}
 
-\newcommand{\TE}  [2]   {\ensuremath{\operatorname{T}_{#1\rightarrow#2}}\xspace}
-\newcommand{\CE}  [3]   {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
+% mutual informations
+\newcommand{\I}  [1] {\op{I}{#1}}
+\newcommand{\T}  [1] {\op{T}{#1}}
+\newcommand{\B}  [1] {\op{B}{#1}}
+\newcommand{\J}  [1] {\op{J}{#1}}
+\newcommand{\II} [1] {\op{II}{#1}}
+
+% common informations
+\newcommand{\K} [1] {\op{K}{#1}}
+\newcommand{\C} [1] {\op{C}{#1}}
+\newcommand{\G} [1] {\op{G}{#1}}
+\newcommand{\F} [1] {\op{F}{#1}}
+\newcommand{\M} [1] {\op{M}{#1}}
+
+% transfer entropies
+\newcommand{\TE} [2] {\ensuremath{\operatorname{T}_{#1\rightarrow#2}}\xspace}
+\newcommand{\CE} [3] {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
+
+% others
+\newcommand{\P}    [1] {\op{P}{#1}}
+\newcommand{\X}    [1] {\op{X}{#1}}
+
+% divergences
+\newcommand{\xH}  [2] {\op{xH}{#1||#2}}
+\newcommand{\DKL} [2] {\op{D_{KL}}{#1||#2}}
+\newcommand{\JSD} [2] {\op{D_{JS}}{#1||#2}}
 
 % operators on random variables
 \newcommand{\meet}      {\curlywedge}
@@ -22,4 +47,9 @@
 \newcommand{\iless}     {\preceq}
 \newcommand{\imore}     {\succeq}
 \newcommand{\ieq}       {\cong}
-\newcommand{\mss}       {\downrightarrow}
+\newcommand{\mss}       {\searrow}
+
+\newcommand{\ind}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}
+
+\DeclareMathOperator*{\meetop}{\scalerel*{\meet}{\textstyle\sum}}
+\DeclareMathOperator*{\joinop}{\scalerel*{\join}{\textstyle\sum}}

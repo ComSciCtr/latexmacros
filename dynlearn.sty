@@ -25,7 +25,6 @@
 
 % formatting of particular things
 \usepackage[final,pagebackref]{hyperref} %
-\usepackage[capitalise]{cleveref}        % Automatically label references
 \usepackage{url}                         % format URLs
 \usepackage[super]{nth}                  % 1st, 2nd, etc
 \usepackage{contour}                     % draw an outline around text
@@ -210,6 +209,11 @@ morekeywords={as},                      % Additional keywords
 \theoremstyle{plain}    \newtheorem*{Rem}{Remark}
 \theoremstyle{plain}    \newtheorem{Def}{Definition}
 \theoremstyle{plain}    \newtheorem*{Not}{Notation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configure cleveref
+
+\usepackage[capitalise]{cleveref}        % Automatically label references
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Finally, computational mechanics and information theory macros
