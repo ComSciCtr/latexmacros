@@ -33,13 +33,17 @@
 \newcommand{\CE} [3] {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
 
 % others
-\newcommand{\P}    [1] {\op{P}{#1}}
-\newcommand{\X}    [1] {\op{X}{#1}}
+\newcommand{\P}   [1] {\op{P}{#1}}
+\newcommand{\X}   [1] {\op{X}{#1}}
+\newcommand{\R}   [1] {\op{R}{#1}}
+\newcommand{\TSE} [1] {\op{TSE}{#1}}
 
 % divergences
-\newcommand{\xH}  [2] {\op{xH}{#1||#2}}
-\newcommand{\DKL} [2] {\op{D_{KL}}{#1||#2}}
-\newcommand{\JSD} [2] {\op{D_{JS}}{#1||#2}}
+\newcommand{\divergence} [3] {\ensuremath{\operatorname{#1}\left[#2~\middle|\middle|~#3\right]}\xspace}
+
+\newcommand{\xH}  [2] {\divergence{xH}{#1}{#2}}
+\newcommand{\DKL} [2] {\divergence{D_{KL}}{#1}{#2}}
+\newcommand{\JSD} [2] {\divergence{D_{JS}}{#1}{#2}}
 
 % operators on random variables
 \newcommand{\meet}      {\curlywedge}
