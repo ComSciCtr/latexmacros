@@ -190,3 +190,47 @@
   \path [name intersections={of=fcso and fcsz, by={i7, i8}}];
   \path [name intersections={of=fcso and present, by={i9, i10}}];
 }
+
+\def \processidiagram {
+  \def \radius {1.25}
+  \def \iradius {1.2}
+  \def \llong {2.25}
+  \def \short {0.825}
+
+  \def \A { (0, 0) arc (90:-90:\radius) -- ++(-\llong,0) arc (270:90:\radius) -- cycle }
+  \def \B { (0, -0.05) arc (90:-90:\iradius) -- ++(-\short,0) arc (270:90:\iradius) -- cycle }
+  \def \C { (1, 0) arc (90:270:\radius) -- ++(\llong,0) arc (-90:90:\radius) -- cycle }
+  \def \D { (1, -0.05) arc (90:270:\iradius) -- ++(\short,0) arc (-90:90:\iradius) -- cycle }
+
+  \path [ultra thick, name path=A] \A;
+  \path [ultra thick, name path=B] \B;
+  \path [ultra thick, name path=C] \C;
+  \path [ultra thick, name path=D] \D;
+
+  \path [name intersections={of=A and D, name=E}];
+
+  \coordinate (c) at (barycentric cs:E-1=17/24,E-2=7/24);
+
+  \def \G { let \p1 = ($(c)-(E-2)$) in (c) circle ({veclen(\x1,\y1)}) }
+
+  \path [ultra thick, name path=G] \G;
+
+  \path [name intersections={of=A and G, by={aa, a}}];
+  \path [name intersections={of=D and G, by={bb, b}}];
+
+  \coordinate (Alabel) at ($ (c) + (-\llong-1.1*\radius, 0.55*\radius) $);
+  \coordinate (Blabel) at ($ (c) + (-\short-1.1*\iradius, 0.25*\iradius) $);
+  \coordinate (Clabel) at ($ (c) + (\short+1.1*\iradius, 0.25*\iradius) $);
+  \coordinate (Dlabel) at ($ (c) + (\llong+1.1*\radius, 0.55*\radius) $);
+  \coordinate (Glabel) at ($ (c) ! 2.5 ! (E-1) $);
+
+  \coordinate (BC) at (barycentric cs:E-1=1/2,E-2=1/2);
+  \coordinate (BGgC) at (barycentric cs:a=2/3,E-1=-1/12,E-2=3/12);
+  \coordinate (CGgB) at (barycentric cs:b=2/3,E-1=-1/12,E-2=3/12);
+  \coordinate (BgCG) at ($ (BC) - (2.25*\short, 0.2*\iradius) $);
+  \coordinate (CgBG) at ($ (BC) + (2.25*\short, -0.2*\iradius) $);
+  \coordinate (AgB) at ($ (BC) - (1.5*\llong, 0) $);
+  \coordinate (DgC) at ($ (BC) + (1.5*\llong, 0) $);
+  \coordinate (BgC) at ($ (BC) - (1.8*\short, 0) $);
+  \coordinate (CgB) at ($ (BC) + (1.8*\short, 0) $);
+}
