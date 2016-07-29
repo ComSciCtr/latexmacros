@@ -14,7 +14,6 @@
 \usepackage{etex}                        %
 \usepackage{ifpdf}                       % write flexible commands
 \usepackage{xspace}                      % let macros play nice with spaces
-\usepackage{xpunctuate}                  % like xspace, but for punctuation
 \usepackage{xcolor}                      % colors
 \usepackage{setspace}                    %
 
@@ -84,8 +83,8 @@
 % foreign stuff, stolen from (and not included because of build systems)
 % \usepackage[abbreviations]{foreign}
 
-\DeclareRobustCommand\eg{\xperiodcommaafter{\textit{e.g}}}
-\DeclareRobustCommand\ie{\xperiodcommaafter{\textit{i.e}}}
+\DeclareRobustCommand\eg{\textit{e.g.}\xspace}
+\DeclareRobustCommand\ie{\textit{i.e.}\xspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cmvec setup
