@@ -3,7 +3,7 @@
 %
 % A style file for papers by the Crutchfield group
 %
-% This document is broken in to many section, seperated by concept and
+% This document is broken into many sections, separated by concept and
 % libraries required.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -14,7 +14,7 @@
 \usepackage{etex}                        %
 \usepackage{ifpdf}                       % write flexible commands
 \usepackage{xspace}                      % let macros play nice with spaces
-\usepackage{xcolor}                      % colors
+\usepackage[table]{xcolor}               % colors
 \usepackage{setspace}                    %
 
 % figures
@@ -28,6 +28,7 @@
 \usepackage[super]{nth}                  % 1st, 2nd, etc
 \usepackage{contour}                     % draw an outline around text
 \usepackage{verbatim}                    %
+\usepackage{paralist}                    % compact itemize, enumerate
 
 % math formating, fonts, and symbols
 \usepackage{amsmath}                     %
@@ -35,9 +36,10 @@
 \usepackage{amsfonts}                    %
 \usepackage{amssymb}                     %
 \usepackage{amsthm}                      %
+\usepackage{scalerel}                    %
 \usepackage{bm}                          % bold
 \usepackage{bbm}                         % more bold
-\usepackage{braket}				% bras and kets for quantum
+\usepackage{braket}                      % bras and kets for quantum
 \usepackage{mathtools}                   % mathclap, etc
 \usepackage{etoolbox}                    %
 \usepackage{textcomp}                    %
@@ -74,6 +76,7 @@
 
 % different authors
 \definecolor{ryan}{RGB}{64, 0, 128}
+\definecolor{nix}{RGB}{255, 0, 0}
 
 \FXRegisterAuthor{jpc}{ajpc}{JPC}
 \FXRegisterAuthor{rgj}{argj}{\color{ryan}RGJ}
@@ -85,6 +88,7 @@
 
 \DeclareRobustCommand\eg{\textit{e.g.}\xspace}
 \DeclareRobustCommand\ie{\textit{i.e.}\xspace}
+\DeclareRobustCommand\etal{\textit{et al.}\xspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cmvec setup
