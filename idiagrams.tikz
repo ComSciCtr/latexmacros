@@ -193,6 +193,46 @@
 
 \def \processidiagram {
   \def \radius {1.25}
+  \def \llong {1.8}
+
+  \def \Past { (0, 0) arc (90:-90:\radius) -- ++(-\llong,0) arc (270:90:\radius) -- cycle }
+  \def \Future { (1, 0) arc (90:270:\radius) -- ++(\llong,0) arc (-90:90:\radius) -- cycle }
+
+  \path [ultra thick, name path=Past] \Past;
+  \path [ultra thick, name path=Future] \Future;
+
+  \path [name intersections={of=Past and Future, name=E}];
+
+  \coordinate (c) at (barycentric cs:E-1=17/24,E-2=7/24);
+
+  \def \Present { (E-1) circle (\radius) }
+
+  \path [ultra thick, name path=Present] \Present;
+
+  \def \Presenta { (1, -\radius) circle (\radius) }
+
+  \path [ultra thick, name path=Presenta] \Presenta;
+
+  \coordinate (Pastlabel) at ($ (c) + (-\llong-\radius, 0.4*\radius) $);
+  \coordinate (Futurelabel) at ($ (c) + (\llong+\radius, 0.4*\radius) $);
+  \coordinate (Presentlabel) at ($ (E-1) + 1.05*(0, \radius) $);
+  \coordinate (Presentalabel) at ($ (1, -\radius) + 1.05*(\radius, 0) $);
+
+  \path [name intersections={of=Present and Past, name=ia}];
+  \path [name intersections={of=Present and Future, name=ib}];
+
+  \coordinate (qmulabel) at ($ (E-1)!0.3!(E-2) $);
+  \coordinate (rmulabel) at ($ (E-1)!0.45!(Presentlabel) $);
+  \coordinate (bmulabel) at ($ ($ (E-1)!0.45!(E-2) $)!0.7!(ib-1)$);
+  \coordinate (bmualabel) at ($ ($ (E-1)!0.45!(E-2) $)!0.7!(ia-1)$);
+  \coordinate (sigmamulabel) at ($ (E-1)!0.7!(E-2) $);
+
+  \coordinate (rhomulabel) at ($ (E-1)!0.5!(E-2) $);
+  \coordinate (hmulabel) at ($ (rhomulabel)!0.66!(Presentalabel) $);
+}
+
+\def \cmprocessidiagram {
+  \def \radius {1.25}
   \def \iradius {1.2}
   \def \llong {2.25}
   \def \short {0.825}
