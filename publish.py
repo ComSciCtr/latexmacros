@@ -10,20 +10,33 @@
 # The work is provided "as is" without warranty, express or implied.
 ###############################################################################
 
+try:
+    import blindspin
+    SPIN = True
+except:
+    SPIN = False
 import click
 import logbook
-import pathlib
-import regex as re
+from logbook.more import ColorizedStderrHandler
+try:
+    import pathlib2 as pathlib
+except:
+    import pathlib
+try:
+    import regex as re
+    re.DEFAULT_VERSION = re.VERSION1
+except:
+    import re
 import sarge
 import sys
 
 from itertools import product
 
-re.DEFAULT_VERSION = re.VERSION1
-
-LOG_STREAM = logbook.StreamHandler(sys.stdout)
-LOG_STREAM.format_string = "{record.level_name}: {record.message}"
+LOG_STREAM = ColorizedStderrHandler()
+LOG_STREAM.format_string = "\r{record.level_name}: {record.message}"
 LOG = logbook.Logger('Publisher')
+
+RUN_CMD = sarge.capture_both
 
 DIRECTORY_NAME = 'publish'
 
@@ -64,7 +77,8 @@ IMAGE_EXTENSIONS = [
 @click.command()
 @click.argument('tex')
 @click.option('--inline', default='', help='comma seperated list of macro files to inline')
-def publish(tex, inline):
+@click.option('--debug', is_flag=True, help='show debug info')
+def publish(tex, inline, debug):
     """
     This command performs several operations:
 
@@ -89,38 +103,38 @@ def publish(tex, inline):
     - Remove unneeded files
 
     """
+    if debug:
+        global RUN_CMD
+        RUN_CMD = sarge.run
+
+
     if len(tex.split('.')) < 2:
         tex += '.tex'
 
     LOG.info('Creating publication version of {}'.format(tex))
     pdir = create_and_populate(tex)
 
-    LOG.info('Removing comments')
-    remove_comments(tex, pdir)
+    tasks = [('Removing comments', (remove_comments, [tex, pdir])),
+             ('Removing TikZ dependency', (remove_tikz, [tex, pdir])),
+             ('Copying images', (copy_and_rename_figures, [tex, pdir])),
+             ('Removing cref dependency', (remove_cref, [tex, pdir])),
+             ('Removing fixmes', (remove_notes, [tex, pdir])),
+             ('Making document final', (make_final, [tex, pdir])),
+             ('Inlining the bbl file', (inline_bbl, [tex, pdir])),
+             ('Compiling document', (compile_tex, [tex, pdir, False])),
+             ('Cleaning directory', (clean_directory, [pdir])),
+    ]
 
-    LOG.info('Removing TikZ dependency')
-    remove_tikz(tex, pdir)
-
-    LOG.info('Copying images')
-    copy_and_rename_figures(tex, pdir)
-
-    LOG.info('Removing cref dependency')
-    remove_cref(tex, pdir)
-
-    LOG.info('Removing fixmes')
-    remove_notes(tex, pdir)
-
-    LOG.info('Making document final')
-    make_final(tex, pdir)
-
-    LOG.info('Inlining the bbl file')
-    inline_bbl(tex, pdir)
-
-    LOG.info('Compiling document')
-    compile_tex(tex, pdir, bibtex=False)
-
-    LOG.info('Cleaning directory')
-    clean_directory(pdir)
+    for task, func in tasks:
+        LOG.info(task)
+        try:
+            if SPIN:
+                with blindspin.spinner():
+                    func[0](*func[1])
+            else:
+                func[0](*func[1])
+        except:
+            return
 
 
 def create_and_populate(tex):
@@ -132,14 +146,19 @@ def create_and_populate(tex):
     if pdir.exists():
         LOG.warn('Removing existing {} directory'.format(DIRECTORY_NAME))
         cmd = sarge.shell_format("rm -rf {0}", DIRECTORY_NAME)
-        sarge.run(cmd, cwd=str(cwd))
+        RUN_CMD(cmd, cwd=str(cwd))
 
     pdir.mkdir()
 
     files = TEMPLATE_FILES + find_bib_files(tex) + [tex]
     for filename in files:
-        cmd = sarge.shell_format("cp {0} {1}", filename, DIRECTORY_NAME)
-        sarge.run(cmd, cwd=str(cwd))
+        if pathlib.Path(filename).exists():
+            cmd = sarge.shell_format("cp {0} {1}", filename, DIRECTORY_NAME)
+            RUN_CMD(cmd, cwd=str(cwd))
+
+    # inline inputs
+    cmd = sarge.shell_format('latexpand --keep-comments {0} -o {1}/{0}', tex, str(pdir))
+    RUN_CMD(cmd, cwd=str(cwd))
 
     return str(pdir)
 
@@ -160,14 +179,10 @@ def find_bib_files(tex):
 def remove_comments(tex, cwd):
     """
     """
-    comment_regex = r'%.*'
-    with open("{}/{}".format(cwd, tex)) as source:
-        source = source.read()
-
-    source = re.sub(comment_regex, '%', source)
-
-    with open("{}/{}".format(cwd, tex), 'w') as output:
-        output.write(source)
+    cmd = sarge.shell_format('latexpand --keep-includes {0} -o {0}_new', tex)
+    RUN_CMD(cmd, cwd=cwd)
+    cmd = sarge.shell_format('mv {0}_new {0}', tex)
+    RUN_CMD(cmd, cwd=cwd)
 
 
 def remove_tikz(tex, cwd):
@@ -200,6 +215,37 @@ def remove_tikz(tex, cwd):
     # generate images
     compile_tex(tex, str(pathlib.Path().cwd()))
 
+    # remove stuff
+    for _ in range(3): # handle nested tikz images
+        remove_tikz_named(tex, cwd, tikz_dir)
+        remove_tikz_unnamed(tex, cwd, tikz_dir)
+
+    remove_tikz_imports(tex, cwd)
+
+
+def remove_tikz_named(tex, cwd, tikz_dir):
+    """
+    """
+    # replace tikzpictures with includegraphics
+    def fig_name(mo):
+        incl_gfx = r'\includegraphics{{{}{}}}'
+        incl_gfx = incl_gfx.format(tikz_dir, mo['filename'])
+        return incl_gfx
+
+    with open("{}/{}".format(cwd, tex)) as source:
+        source = source.read()
+
+    tikz_regex = r'(?:\\tikzsetnextfilename\{(?P<filename>\w*?)\})(?:(?!tikzpicture).)*?(?:\\begin\{tikzpicture\}(?:(?!tikzpicture).)*?\\end\{tikzpicture\})'
+
+    source = re.sub(tikz_regex, fig_name, source, flags=re.MULTILINE|re.DOTALL)
+
+    with open("{}/{}".format(cwd, tex), 'w') as output:
+        output.write(source)
+
+
+def remove_tikz_unnamed(tex, cwd, tikz_dir):
+    """
+    """
     # replace tikzpictures with includegraphics
     def fig_name_gen():
         incl_gfx = r'\includegraphics{{{{{}{}-figure{{}}}}}}'
@@ -213,7 +259,7 @@ def remove_tikz(tex, cwd):
     with open("{}/{}".format(cwd, tex)) as source:
         source = source.read()
 
-    tikz_regex = r'\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}'
+    tikz_regex = r'\\begin\{tikzpicture\}(?:(?!tikzpicture).)*?\\end\{tikzpicture\}'
     repls = fig_name_gen()
 
     source = re.sub(tikz_regex, lambda mo: next(repls), source, flags=re.MULTILINE|re.DOTALL)
@@ -221,17 +267,20 @@ def remove_tikz(tex, cwd):
     with open("{}/{}".format(cwd, tex), 'w') as output:
         output.write(source)
 
-    # comment out tikz includes
+
+def remove_tikz_imports(tex, cwd):
+    """
+    """
     tikz_imports = [
         r'\\usepackage\{tikz\}',
-        r'\\usetikzlibrary\{.*\}',
-        r'\\pgfkeys\{.*\}',
+        r'\\usetikzlibrary\{.*?\}',
+        r'\\pgfkeys\{.*?\}',
         r'\\tikzexternalize',
-        r'\\tikzsetexternalprefix\{.*\}',
-        r'\\input\{.*\.tikz\}',
+        r'\\tikzsetexternalprefix\{.*?\}',
+        r'\\input\{.*?\.tikz\}',
         r'\\usepackage\{pgfplots\}',
-        r'\\usepgfplotslibrary\{.*\}',
-        r'\\pgfplotsset\{.*\}',
+        r'\\usepgfplotslibrary\{.*?\}',
+        r'\\pgfplotsset\{.*?\}',
     ]
     comment_lines("{}/{}".format(cwd, 'dynlearn.sty'), tikz_imports)
 
@@ -287,7 +336,7 @@ def find_img(path):
             if img.exists():
                 break
         else:
-            LOG.warn("Could not find an image matching {}".format(path))
+            LOG.error("Could not find an image matching {}".format(path))
             return None
     return str(img)
 
@@ -307,15 +356,19 @@ def remove_cref(tex, cwd):
     for exp, repl in [cref_regex1, cref_regex2]:
         source = re.sub(exp, repl, source)
 
+
     with open(sty_file, 'w') as dynlearn:
         dynlearn.write(source)
+
 
     # generate and run the sed script
     compile_tex(tex, cwd)
 
-    sed_cmd = sarge.shell_format("sed -f {0}.sed {0}.tex > {0}.tex.temp", tex.split('.')[0])
-    sarge.run(sed_cmd, cwd=cwd)
-    sarge.run(sarge.shell_format("mv {0}.temp {0}", tex), cwd=cwd)
+    sed_cmd = sarge.shell_format("sed -f {0}.sed {0}.tex", tex.split('.')[0])
+    cleaned = RUN_CMD(sed_cmd, cwd=cwd, stdout=sarge.Capture())
+
+    with (pathlib.Path(cwd) / tex).open('w') as output:
+        output.write(cleaned.stdout.text)
 
     # remove the cleveref import
     cref_regex3 = r'\\usepackage\[.*\]\{cleveref\}'
@@ -341,6 +394,14 @@ def remove_notes(tex, cwd):
         output.write(source)
 
     comment_lines("{}/{}".format(cwd, tex), [r'\\listoffixmes'])
+
+
+    regexs2 = [ r'\\{}{}\{{.*?\}}'.format(a, t) for a, t in product(authors, note_types)]
+
+    for regex in regexs2:
+        if re.findall(regex, source, re.MULTILINE|re.DOTALL):
+            LOG.error("Some notes could not be removed due to nested curly braces.")
+            raise Exception()
 
     fx_regexs = [
         r'\\usepackage.*\{fixme\}',
@@ -424,7 +485,7 @@ def compile_tex(tex, cwd, bibtex=True):
         cmds = [pdflatex, bibtex] + cmds
 
     for cmd in cmds:
-        sarge.capture_both(cmd, cwd=cwd)
+        RUN_CMD(cmd, cwd=cwd)
 
 
 def clean_directory(cwd):
