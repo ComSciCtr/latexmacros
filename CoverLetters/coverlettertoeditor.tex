@@ -1,0 +1,138 @@
+% Example cover letter to journal editor
+%
+% jpc: 3/13/17
+
+\documentclass[10pt,stdletter]{newlfm}
+\usepackage{apacite}
+\usepackage{charter}
+\usepackage{epstopdf}
+\usepackage{color}
+\definecolor{UCDBlue}{rgb}{0.067, 0.278, 0.506}
+\definecolor{UCDGold}{rgb}{0.855, 0.686, 0.024}
+
+\usepackage{color}
+\newcommand{\alert}[1]{\textbf{\textcolor{red}{#1}}}
+
+\usepackage{amsmath}
+%%%%%%%%%%%%\usepackage{bordermatrix} % matrix with labeled row and col
+%\usepackage{kbordermatrix} % matrix with labeled row and col
+\usepackage{amscd}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bigints}
+\usepackage{braket}
+\usepackage{xfrac}
+
+\input{cmechabbrev}
+\newcommand{\Abet}{\ProcessAlphabet}
+\newcommand{\MS}{\MeasSymbol}
+\newcommand{\MSs}{\MeasSymbols}
+\newcommand{\ms}{\meassymbol}
+\newcommand{\SSet}{\CausalStateSet}
+\newcommand{\St}{\CausalState}
+\newcommand{\st}{\causalstate}
+
+\definecolor{reviewblack}{rgb}{0.5, 0.5, 0.5}
+\definecolor{todored}{rgb}{0.8, 0.2, 0.2}
+\definecolor{replyblue}{rgb}{0.1, 0.1, 0.8}
+\definecolor{highlightorange}{rgb}{0.9, 0.5, 0.1}
+
+\newcommand{\TODO}[1]{\textcolor{todored}{#1}}
+\newcommand{\REVIEW}[1]{{ \it \textcolor{reviewblack}{#1}}}
+\newcommand{\REPLY}[1]{\textcolor{UCDBlue}{#1}}
+\newcommand{\HIGHLIGHT}[1]{\textbf{\textcolor{UCDGold}{#1}}}
+
+
+%\newcommand{\TODO}[1]{\textbf{\textcolor{todored}{#1}}}
+%\newcommand{\REVIEW}[1]{\textbf{\textcolor{reviewblack}{#1}}}
+%\newcommand{\REPLY}[1]{\textbf{\textcolor{replyblue}{#1}}}
+%\newcommand{\HIGHLIGHT}[1]{\textbf{\textcolor{highlightorange}{#1}}}
+
+\usepackage[colorlinks = True, urlcolor = UCDBlue]{hyperref}
+
+%\widowpenalty=1000
+%\clubpenalty=1000
+
+\newsavebox{\LUCM}
+\sbox{\LUCM}{%
+	\parbox[b]{1.5in}{%
+		\vspace{0.25in}%
+		\includegraphics[scale=0.4]
+		{expanded_logo_cmyk_gold-blue}%
+	}%
+}%
+\makeletterhead{UCM}{\Lheader{\usebox{\LUCM}}}
+
+%\newlfmP{headermarginskip=2pt}
+%\newlfmP{sigsize=20pt}
+%\newlfmP{dateskipafter=40pt}
+%\newlfmP{addrfromphone}
+%\newlfmP{addrfromemail}
+%\PhrPhone{Phone}
+%\PhrEmail{Email}
+
+\lthUCM
+
+\begin{document}
+\begin{newlfm}
+
+\date{}
+
+\vspace{-1in}
+
+Editors\\
+Physical Review $N+1$
+
+Dear Editors,
+
+My coauthors and I would appreciate your considering the manuscript ``Most
+Amazing Science Yet!'' for publication in Physical Review $N+1$.
+
+Give background. Brief, easy to understand.
+
+Explain motivation for problem.
+
+State compelling results.
+
+Say why you submitted to this journal and any special issues, if any.
+
+Thus, Physical Review $N+1$ is the ideal venue; and, its audience is ready to
+appreciate the results. Given the impact and the work's short length its
+appearing as a Rapid Communication seems particularly appropriate.
+
+Recommend reviewers.
+
+Due to the work's interdisciplinary nature---combining as it does information
+theory, dynamical systems, stochastic processes, and statistical mechanics---we
+recommend several researchers with the appropriate background: Sebastian
+Deffner (Physics, UMBC, deffner@umbc.edu), David Feldman (College of the
+Atlantic, Bar Harbor, Maine, dfeldman@coa.edu), Jon Machta (Physics, U.
+Massachusetts, Amherst), machta@physics.umass.edu, and Christopher Moore (Santa
+Fe Institute, Santa Fe, New Mexico, moore@santafe.edu).
+
+Note folks who should not referee.
+
+Based on recent past experience, we also ask that the following individuals not
+be selected to review the manuscript due to conflicts of interest: Peter
+Grassberger (pgrassbe@ucalgary.ca), Neri Merhav (merhav@ee.technion.ac.il),
+Thomas Ouldridge (Imperial College, London), Cosma Shalizi
+(cshalizi@stat.cmu.edu, CMU), Stephen Wolfram (sw-office@wolfram.com),
+employees of Wolfram Research Inc., and David Wolpert (Santa Fe Institute,
+dhw@santafe.edu).
+
+Thanks in advance for your consideration.
+
+Best regards,
+
+\includegraphics[trim = 0 0in 0 0in, width=2in]{JPCSignature}
+
+James P. Crutchfield\\
+Director, Complexity Sciences Center\\
+Professor of Physics
+
+\end{newlfm}
+
+\end{document}
+
