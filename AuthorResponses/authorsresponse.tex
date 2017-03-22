@@ -2,10 +2,35 @@
 % "Extreme Quantum Advantage when Simulating Classical Systems with
 % 	Long-Range Interaction"
 %
+% jpc: 3/13/17, 3/21/17
 
-\documentclass[10pt,stdletter]{newlfm}
+\documentclass{article}
+\usepackage{charter,graphicx,fancyhdr,geometry}
+
+\geometry{paper=letterpaper,
+  hmargin=1in,
+  vmargin=1.5in,
+  top = 0.25in,
+  bottom = 1in,
+  }
+
+\pagestyle{fancy}
+\fancyhf{}% Clear header/footer
+\renewcommand{\headrulewidth}{0pt}% No header rule
+\renewcommand{\footrulewidth}{1pt}% 1pt footer rule
+\fancyfoot[C]{%
+  \small
+  \begin{tabular}{c}
+    Complexity Sciences Center, Physics Department,
+    University of California, Davis, CA 95616-5270\\
+    http://csc.ucdavis.edu/
+  \end{tabular}}
+\fancyfoot[R]{\thepage}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.5\baselineskip plus 2pt minus 2pt}
+
 \usepackage{apacite}
-\usepackage{charter}
 \usepackage{epstopdf}
 \usepackage{color}
 \definecolor{UCDBlue}{rgb}{0.067, 0.278, 0.506}
@@ -15,7 +40,7 @@
 \newcommand{\alert}[1]{\textbf{\textcolor{red}{#1}}}
 
 \usepackage{amsmath}
-%%%%%%%%%%%%\usepackage{bordermatrix} % matrix with labeled row and col
+%\usepackage{bordermatrix} % matrix with labeled row and col
 %\usepackage{kbordermatrix} % matrix with labeled row and col
 \usepackage{amscd}
 \usepackage{amsmath}
@@ -35,7 +60,6 @@
 \newcommand{\St}{\CausalState}
 \newcommand{\st}{\causalstate}
 
-
 \definecolor{reviewblack}{rgb}{0.5, 0.5, 0.5}
 \definecolor{todored}{rgb}{0.8, 0.2, 0.2}
 \definecolor{replyblue}{rgb}{0.1, 0.1, 0.8}
@@ -46,43 +70,15 @@
 \newcommand{\REPLY}[1]{\textcolor{UCDBlue}{#1}}
 \newcommand{\HIGHLIGHT}[1]{\textbf{\textcolor{UCDGold}{#1}}}
 
-
-%\newcommand{\TODO}[1]{\textbf{\textcolor{todored}{#1}}}
-%\newcommand{\REVIEW}[1]{\textbf{\textcolor{reviewblack}{#1}}}
-%\newcommand{\REPLY}[1]{\textbf{\textcolor{replyblue}{#1}}}
-%\newcommand{\HIGHLIGHT}[1]{\textbf{\textcolor{highlightorange}{#1}}}
-
-
 \usepackage[colorlinks = True, urlcolor = UCDBlue]{hyperref}
 
-%\widowpenalty=1000
-%\clubpenalty=1000
-
-\newsavebox{\LUCM}
-\sbox{\LUCM}{%
-	\parbox[b]{1.5in}{%
-		\vspace{0.25in}%
-		\includegraphics[scale=0.4]
-		{expanded_logo_cmyk_gold-blue}%
-	}%
-}%
-\makeletterhead{UCM}{\Lheader{\usebox{\LUCM}}}
-
-%\newlfmP{headermarginskip=2pt}
-%\newlfmP{sigsize=20pt}
-%\newlfmP{dateskipafter=40pt}
-%\newlfmP{addrfromphone}
-%\newlfmP{addrfromemail}
-%\PhrPhone{Phone}
-%\PhrEmail{Email}
-
-\lthUCM
-
-
 \begin{document}
-\begin{newlfm}
+\includegraphics[height=3\baselineskip]{expanded_logo_cmyk_gold-blue}
+\hspace{3.7in}
+\includegraphics[height=5\baselineskip]{Logo_CSC}
 
-\vspace{-1.5in}
+\hrulefill
+
 \begin{center}
 Authors' response to referee's comments on\\
 \vspace{0.1in}
@@ -230,8 +226,6 @@ Just one correction: ``it's'' on p.~$2$ should be ``its''.
 }
 
 \REPLY{Corrected.}
-
-\end{newlfm}
 
 \end{document}
 
