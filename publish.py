@@ -11,7 +11,7 @@
 ###############################################################################
 
 try:
-    from halo import Halo
+    import blindspin
     SPIN = True
 except:
     SPIN = False
@@ -76,7 +76,7 @@ IMAGE_EXTENSIONS = [
 
 @click.command()
 @click.argument('tex')
-@click.option('--inline', is_flag=True, help='inline all tex and sty files')
+@click.option('--inline', default='', help='comma seperated list of macro files to inline')
 @click.option('--debug', is_flag=True, help='show debug info')
 def publish(tex, inline, debug):
     """
@@ -111,8 +111,7 @@ def publish(tex, inline, debug):
     if len(tex.split('.')) < 2:
         tex += '.tex'
 
-    run_task(task='info', msg='Creating publication version of {}'.format(tex))
-
+    LOG.info('Creating publication version of {}'.format(tex))
     pdir = create_and_populate(tex)
 
     tasks = [('Removing comments', (remove_comments, [tex, pdir])),
@@ -123,45 +122,19 @@ def publish(tex, inline, debug):
              ('Making document final', (make_final, [tex, pdir])),
              ('Inlining the bbl file', (inline_bbl, [tex, pdir])),
              ('Compiling document', (compile_tex, [tex, pdir, False])),
-             ('Cleaning directory', (clean_directory, [tex, pdir])),
+             ('Cleaning directory', (clean_directory, [pdir])),
     ]
 
-    if inline:
-        tasks[7:8] = [('Inlining files', (inline_files, [tex, pdir]))]
-        global UNWANTED_EXTENSIONS
-        UNWANTED_EXTENSIONS += ['sty', 'tex']
-
     for task, func in tasks:
-        run_task(task=func, msg=task)
-
-
-def run_task(task, msg, style=None):
-    """
-    """
-    if SPIN:
-        with Halo(text=msg) as spinner:
-            if task == 'info':
-                spinner.info()
-            elif task == 'warn':
-                spinner.warn()
+        LOG.info(task)
+        try:
+            if SPIN:
+                with blindspin.spinner():
+                    func[0](*func[1])
             else:
-                try:
-                    task[0](*task[1])
-                    spinner.succeed()
-                except Exception as e:
-                    spinner.fail()
-                    raise(e)
-    else:
-        if task == 'info':
-            LOG.info(msg)
-        elif task == 'warn':
-            LOG.warn(msg)
-        else:
-            LOG.info(msg)
-            try:
-                task[0](*task[1])
-            except Exception as e:
-                raise(e)
+                func[0](*func[1])
+        except:
+            return
 
 
 def create_and_populate(tex):
@@ -171,7 +144,7 @@ def create_and_populate(tex):
     pdir = (cwd / DIRECTORY_NAME)
 
     if pdir.exists():
-        run_task(task='warn', msg='Removing existing {} directory'.format(DIRECTORY_NAME))
+        LOG.warn('Removing existing {} directory'.format(DIRECTORY_NAME))
         cmd = sarge.shell_format("rm -rf {0}", DIRECTORY_NAME)
         RUN_CMD(cmd, cwd=str(cwd))
 
@@ -521,24 +494,15 @@ def compile_tex(tex, cwd, bibtex=True):
         RUN_CMD(cmd, cwd=cwd)
 
 
-def clean_directory(tex, cwd):
+def clean_directory(cwd):
     """
     """
     p = pathlib.Path(cwd)
     for ext in UNWANTED_EXTENSIONS:
         files = p.glob('*.{}'.format(ext))
         for file in files:
-            if file.exists() and file.name != tex:
+            if file.exists():
                 file.unlink()
-
-
-def inline_files(tex, cwd):
-    """
-    """
-    cmd = sarge.shell_format('latexpand --expand-usepackage {0} -o {0}_new', tex)
-    RUN_CMD(cmd, cwd=cwd)
-    cmd = sarge.shell_format('mv {0}_new {0}', tex)
-    RUN_CMD(cmd, cwd=cwd)
 
 
 if __name__ == '__main__':

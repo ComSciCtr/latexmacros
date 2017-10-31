@@ -18,17 +18,23 @@
 \usepackage{setspace}                    %
 
 % figures
-\usepackage[final]{graphicx}             %
-\usepackage[caption=false]{subfig}       % subfigures; caption and subcaption
-                                         % are incompatible with revtex4.1
+\PassOptionsToPackage{final}{graphicx}   % keep things consistant
+\usepackage{graphicx}                    % \includegraphics
 
-% formatting of particular things
-\usepackage[final,pagebackref]{hyperref} %
+% formatting of particular things        %
+\makeatletter                            % pagebackref doesn't work with beamer
+\@ifclassloaded{beamer}{}{\PassOptionsToPackage{pagebackref}{hyperref}}
+\makeatother
+\usepackage{hyperref}
 \usepackage{url}                         % format URLs
 \usepackage[super]{nth}                  % 1st, 2nd, etc
 \usepackage{contour}                     % draw an outline around text
 \usepackage{verbatim}                    %
-\usepackage{paralist}                    % compact itemize, enumerate
+\usepackage{ragged2e}                    %
+\usepackage{attrib}                      %
+\usepackage{adjustbox}                   %
+\usepackage[absolute,overlay]{textpos}   %
+\usepackage{calc}                        %
 
 % math formating, fonts, and symbols
 \usepackage{amsmath}                     %
@@ -61,6 +67,42 @@
 \usepackage{booktabs}                    % nicer tables
 \usepackage{dcolumn}                     % align by decimal in tables
 
+\makeatletter
+  \@ifclassloaded{revtex4-1}
+  {
+    \usepackage[caption=false]{subfig}   % subfigures; caption and subcaption
+                                         % are incompatible with revtex4.1
+  }
+  {
+    \usepackage{caption}
+    \usepackage{subcaption}
+  }
+  \@ifclassloaded{beamer}
+  {
+    \usepackage[backend=biber,
+                autocite=superscript,
+                doi=false,
+                url=false,
+                sorting=none]{biblatex}
+    \usepackage[useregional,showdow]{datetime2}
+  }
+  {
+    % if not using beamer...
+    \usepackage{enumitem}                % customizable list environments
+  }
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% colors
+
+% different authors
+\definecolor{ryan}{RGB}{64, 0, 64}
+\definecolor{nix}{RGB}{255, 0, 0}
+
+\definecolor{ucdblue1}{cmyk}{.87,.46,0,.49} % RGB (17,70,129,255)  HTML(A) 114681(FF)
+\definecolor{ucdblue2}{cmyk}{1., .56, 0., .34}
+\colorlet{ucdblue}{ucdblue2}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fixme: put todos and such in the document
 
@@ -74,13 +116,10 @@
 \fxsetup{theme=color,mode=multiuser}
 \fxsetface{inline}{\bfseries}
 
-% different authors
-\definecolor{ryan}{RGB}{64, 0, 128}
-\definecolor{nix}{RGB}{255, 0, 0}
-
 \FXRegisterAuthor{jpc}{ajpc}{JPC}
 \FXRegisterAuthor{rgj}{argj}{\color{ryan}RGJ}
 \FXRegisterAuthor{jrm}{ajrm}{JRM}
+\FXRegisterAuthor{je}{aje}{\color{green!66!black}JE}
 \FXRegisterAuthor{ca}{aca}{CA}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,6 +149,7 @@
 \usetikzlibrary{arrows}
 \usetikzlibrary{automata}
 \usetikzlibrary{calc}
+\usetikzlibrary{decorations.markings}
 \usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{external}
 \usetikzlibrary{intersections}
@@ -153,6 +193,9 @@
 %         \fi
 %     },
 % }
+
+\usepackage{tcolorbox}
+\usepackage{circuitikz}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % colors
@@ -218,6 +261,19 @@ morekeywords={as},                      % Additional keywords
 % Configure cleveref
 
 \usepackage[capitalise]{cleveref}        % Automatically label references
+\crefname{Lem}{Lemma}{Lemmas}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Logos
+
+\newcommand{\csclogo}{
+  \centering
+  \tikzsetnextfilename{csclogo}
+  \begin{tikzpicture}
+    \draw (0, 0) node {\includegraphics[height=1.0cm]{images/expanded_logo_cmyk_blue}};
+    \draw (0, 0.7) node [color=ucdblue, scale=0.9] {\small Complexity Sciences Center};
+  \end{tikzpicture}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Finally, computational mechanics and information theory macros
@@ -236,12 +292,27 @@ morekeywords={as},                      % Additional keywords
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{3pt plus 2pt minus 2pt}
 
-\hypersetup{
-  colorlinks,
-  linkcolor={blue!50!black},
-  citecolor={blue!50!black},
-  urlcolor={blue!80!black},
-}
+\def \justify {\justifying \leftskip 0.0cm \rightskip 0.5cm}
+\newcommand{\vtiny}{\fontsize{5.5pt}{1pt}\selectfont}
+
+\makeatletter
+  \@ifclassloaded{beamer}
+  {
+    \hypersetup{
+      linkcolor={blue!50!black},
+      citecolor={blue!50!black},
+      urlcolor={blue!80!black},
+    }
+  }
+  {
+    \hypersetup{
+      colorlinks,
+      linkcolor={blue!50!black},
+      citecolor={blue!50!black},
+      urlcolor={blue!80!black},
+    }
+  }
+\makeatother
 
 % working paper commands
 \newcommand{\arxiv}[1]{\href{http://arxiv.org/abs/#1}{\texttt{arXiv}:#1}}
