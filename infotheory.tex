@@ -6,7 +6,7 @@
 % functions
 \newcommand{\op} [3] [] {
   \ensuremath{
-    \operatorname{#2_{#1}}
+    \operatorname{#2_{#1}}\!
     \if\relax\detokenize{#3}\relax
     \else
       \left[ #3 \right]
@@ -37,8 +37,10 @@
 \newcommand{\M} [2] [] {\op[#1]{M}{#2}}
 
 % transfer entropies
-\newcommand{\TE} [2] {\ensuremath{\operatorname{T}_{#1\rightarrow#2}}\xspace}
-\newcommand{\CE} [3] {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
+\newcommand{\TDMI} [2] {\ensuremath{\operatorname{TDMI}_{#1\rightarrow#2}}\xspace}
+\newcommand{\TE}   [2] {\ensuremath{\operatorname{T}_{#1\rightarrow#2}}\xspace}
+\newcommand{\ITE}  [2] {\ensuremath{\operatorname{IT}_{#1\rightarrow#2}}\xspace}
+\newcommand{\CE}   [3] {\ensuremath{\operatorname{\mathcal{C}}_{#1\rightarrow#2|#3}}\xspace}
 
 % others
 \renewcommand{\P}  [2] [] {\op[#1]{P}{#2}}
@@ -67,3 +69,12 @@
 
 \DeclareMathOperator*{\meetop}{\scalerel*{\meet}{\textstyle\sum}}
 \DeclareMathOperator*{\joinop}{\scalerel*{\join}{\textstyle\sum}}
+
+\makeatletter
+\newcommand{\superimpose}[2]{%
+  {\ooalign{$#1\@firstoftwo#2$\cr\hfil$#1\@secondoftwo#2$\hfil\cr}}}
+\makeatother
+
+\newcommand{\Townarrow}{\mathpalette\superimpose{{\Downarrow}{\downarrow}}}
+
+\newcommand{\markov}{\small{\mbox{$-\hspace{-1.3mm} \circ \hspace{-1.3mm}-$}}}
