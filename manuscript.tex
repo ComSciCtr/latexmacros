@@ -1,3 +1,8 @@
+% latexmacros: CSC's manuscript template
+%
+% jpc: 11/10/2018
+% rgj: 
+
 \documentclass[draft,nofootinbib,aps,prl,twocolumn,showpacs,groupaddress,preprintnumbers,floatfix]{revtex4-1}
 
 \usepackage{dynlearn}
@@ -98,7 +103,47 @@ This is an introduction. See, \eg \cref{fig:even_process} for an example of an \
 
 \rgjnote{This is a note for Ryan!}
 
-This should be an arrow $\uparrow$ and a ket $\ket{A}$.
+\section{Computational Mechanics Symbols}
+\label{sec:Symbols}
+
+An up arrow $\uparrow$.
+
+A ket $\ket{A}$.
+
+% Test for harpoon-like forward and reverse time arrows
+% From cmvec.sty. However, that uses constructs that don't compile at arXiv.org
+% and journals.
+
+From cmvec.sty: Arrow and harpoon symbol accents. Note, the TeX constructions
+do not compile on arXiv.org and most journals. Until cmvec.sty is rewritten to
+address this, then the following should not be used in LaTeX heading for
+publication.
+
+NOTE: For regular use of this file as a manuscript template, arrows and
+harpoons here are commented out, as is cmvec.sty in dynlearn.sty.
+
+Forward and reverse time arrows:
+% $\CMlarrow{X}$
+% $\CMrarrow{X}$
+% $\CMlrarrow{X}$
+
+Extensible versions:
+% $\CMxlarrow{X}$
+% $\CMxrarrow{X}$
+% $\CMxlrarrow{X}$
+
+Harpoon forward and reverse time arrows:
+% $\CMlharpoon{X}$
+% $\CMrharpoon{X}$
+% $\CMlrharpoon{X}$
+
+Extensible versions:
+% $\CMxlharpoon{X}$
+% $\CMxrharpoon{X}$
+% $\CMxlrharpoon{X}$
+
+\section{Figures}
+\label{sec:Figures}
 
 \begin{figure}
   \centering
