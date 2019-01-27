@@ -51,7 +51,6 @@
 \usepackage{textcomp}                    %
 \usepackage{stmaryrd}                    % some computer science symbols
 \usepackage{nicefrac}                    % pretty fractions
-\usepackage[binary-units]{siunitx}       % format units including bits
 
 % generic packages for nicer fonts
 \usepackage[T1]{fontenc}                 % allow copy/paste of unicode
@@ -66,16 +65,26 @@
 % better tables
 \usepackage{booktabs}                    % nicer tables
 \usepackage{dcolumn}                     % align by decimal in tables
+\usepackage{multirow}                    % multirow support in tables
 
 \makeatletter
   \@ifclassloaded{revtex4-1}
   {
     \usepackage[caption=false]{subfig}   % subfigures; caption and subcaption
                                          % are incompatible with revtex4.1
+
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     % foreign stuff, stolen from (and not included because of build systems)
+     % \usepackage[abbreviations]{foreign}
+
+     \DeclareRobustCommand\eg{\textit{e.g.}\xspace}
+     \DeclareRobustCommand\ie{\textit{i.e.}\xspace}
+     \DeclareRobustCommand\etal{\textit{et al.}\xspace}
   }
   {
     \usepackage{caption}
     \usepackage{subcaption}
+    \usepackage[abbreviations]{foreign}
   }
   \@ifclassloaded{beamer}
   {
@@ -83,12 +92,24 @@
                 autocite=superscript,
                 doi=false,
                 url=false,
-                sorting=none]{biblatex}
+                sorting=none,
+                bibstyle=numeric,
+                citestyle=numeric,
+                bibencoding=utf8,
+                ]{biblatex}
     \usepackage[useregional,showdow]{datetime2}
+    \setbeamertemplate{bibliography item}{\insertbiblabel}
   }
   {
     % if not using beamer...
     \usepackage{enumitem}                % customizable list environments
+  }
+  \@ifclassloaded{beamerposter}
+  {
+  }
+  {
+    \usepackage{bm}                          % bold
+    \usepackage{bbm}                         % more bold
   }
 \makeatother
 
@@ -123,12 +144,11 @@
 \FXRegisterAuthor{ca}{aca}{CA}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% foreign stuff, stolen from (and not included because of build systems)
-% \usepackage[abbreviations]{foreign}
+% siunitx setup
 
-\DeclareRobustCommand\eg{\textit{e.g.}\xspace}
-\DeclareRobustCommand\ie{\textit{i.e.}\xspace}
-\DeclareRobustCommand\etal{\textit{et al.}\xspace}
+\usepackage[binary-units]{siunitx}       % format units including bits
+
+\sisetup{quotient-mode=fraction, fraction-function=\nicefrac}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cmvec setup
@@ -152,6 +172,7 @@
 \usetikzlibrary{decorations.markings}
 \usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{external}
+\usetikzlibrary{fit}
 \usetikzlibrary{intersections}
 \usetikzlibrary{patterns}
 \usetikzlibrary{plotmarks}
@@ -174,10 +195,21 @@
 
 %%% pgfplots
 \usepackage{pgfplots}
+\usepgfplotslibrary{colorbrewer}
 \usepgfplotslibrary{fillbetween}
 \usepgfplotslibrary{groupplots}
 \usepgfplotslibrary{units}
 \pgfplotsset{compat=newest}
+
+%% allow visibility stuff in tikz
+
+% \tikzset{
+%   invisible/.style={opacity=0.2},
+%   visible on/.style={alt={#1{}{invisible}}},
+%   alt/.code args={<#1>#2#3}{%
+%     \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}%
+%   }
+% }
 
 %% Dynamically add plot labels to the legend, commented out because it is
 %% incompatible with the standard legend code. Useful in Beamer talks.
@@ -194,7 +226,12 @@
 %     },
 % }
 
+\usepackage{pgfplotstable}
+
 \usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\tcbuselibrary{skins}
+
 \usepackage{circuitikz}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,7 +257,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Used for code samples
 
+%% listings
+
 \usepackage{listings}
+
 \lstdefinestyle{mypython}{
 language=Python,                        % Code langugage
 basicstyle=\small\ttfamily,             % Code font, Examples: \footnotesize, \ttfamily
@@ -240,6 +280,54 @@ showspaces=false,                       % Dont make spaces visible
 showtabs=false,                         % Dont make tabls visible
 morekeywords={as},                      % Additional keywords
 }
+
+%% minted
+
+\makeatletter
+  \@ifclassloaded{beamer}
+  {
+    \usepackage{minted}
+
+    % automatic line breaks:
+    \ExplSyntaxOn
+    \box_new:N \l_fvrb_box
+    \tl_new:N \l_fvrb_tl
+
+    \RenewDocumentCommand \FancyVerbFormatLine { m }
+     {
+       \hbox_set:Nn \l_fvrb_box { #1 }
+        \dim_compare:nNnTF { \box_wd:N \l_fvrb_box }>{ \linewidth }
+          {%box to big
+           \tl_set:Nn \l_fvrb_tl { #1 }
+           \fvrb_use_tl:N \l_fvrb_tl
+          }
+          {%box fits
+           \box_use:N \l_fvrb_box
+          }
+     }
+
+    \cs_new:Npn \fvrb_use_tl:N  #1
+     {
+      \group_begin:
+       \null\hfill\vbox_set:Nn \l_fvrb_box
+         {\hsize=\linewidth
+          \renewcommand\thelinenumber{
+            \ifnum\value{linenumber}=1\relax\else\fi
+          }
+          \begin{internallinenumbers}
+            \advance\hsize by -2em
+            \hspace*{-2em}\tl_use:N #1
+          \end{internallinenumbers}
+         }
+       \box_use:N \l_fvrb_box
+      \group_end:
+    }
+
+    \ExplSyntaxOff
+  }
+  {
+  }
+\makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Various theorem styles
@@ -277,6 +365,9 @@ morekeywords={as},                      % Additional keywords
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Finally, computational mechanics and information theory macros
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \input{cmechabbrev}
 \input{infotheory}

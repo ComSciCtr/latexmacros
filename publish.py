@@ -243,7 +243,7 @@ def remove_tikz(tex, cwd):
         dynlearn.write(source)
 
     # generate images
-    compile_tex(tex, str(pathlib.Path().cwd()))
+    compile_tex(tex, str(pathlib.Path().cwd()), shell_escape=True)
 
     # remove stuff
     for _ in range(3): # handle nested tikz images
@@ -312,7 +312,9 @@ def remove_tikz_imports(tex, cwd):
         r'\\usepackage\{pgfplots\}',
         r'\\usepgfplotslibrary\{.*?\}',
         r'\\pgfplotsset\{.*?\}',
+        r'\\usepackage\{pgfplotstable\}',
         r'\\usepackage\{tcolorbox\}',
+        r'\\tcbuselibrary\{.*?\}',
         r'\\usepackage\{circuitikz\}',
     ]
     comment_lines("{}/{}".format(cwd, 'dynlearn.sty'), tikz_imports)
@@ -511,10 +513,13 @@ def comment_lines(filename, regexs):
         output.write(source)
 
 
-def compile_tex(tex, cwd, bibtex=True):
+def compile_tex(tex, cwd, bibtex=True, shell_escape=False):
     """
     """
-    pdflatex = "pdflatex --shell-escape {}".format(tex)
+    if shell_escape:
+        pdflatex = "pdflatex -shell-escape {}".format(tex)
+    else:
+        pdflatex = "pdflatex {}".format(tex)
     bibtex = "bibtex {}".format(tex.split('.')[0])
 
     cmds = [pdflatex, pdflatex]
