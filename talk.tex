@@ -1,0 +1,711 @@
+\PassOptionsToPackage{table}{xcolor}
+\documentclass[final,serif,aspectratio=1610]{beamer}
+
+\usepackage{dynlearn}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer configuration
+
+\usetheme{Darmstadt}
+
+\beamertemplatenavigationsymbolsempty
+
+\setbeamercolor{structure}{fg=ryan}
+
+\makeatletter
+  \let\frametextheight\beamer@frametextheight
+\makeatother
+
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%     \tableofcontents[
+%       currentsection,
+%       currentsubsection,
+%       hideothersubsections,
+%       sectionstyle=show/shaded,
+%       % subsectionstyle=show/hide,
+%     ]
+%   \end{frame}
+% }
+
+\tcbset{colback=ryan!5!white, colframe=ryan}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definitions specific to this talk
+
+\input{project_defs}
+
+\addbibresource{chaos.bib}
+\addbibresource{project.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Talk info
+
+\title{%
+  \Huge Secret Key Agreement and Unique Information
+}
+
+\author[RGJ]{\Large\textbf{Ryan G. James}}
+
+\institute[UCD]{%
+  \csclogo
+}
+
+\DTMsavedate{date}{2018-10-20}
+
+\date{%
+  % \includegraphics[height=1.5cm]{images/ccs_logo}
+  APS Far West Section \\
+  \DTMusedate{date}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Talk
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+  \frametitle{}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Partial Information Decomposition}
+
+\subsection{Definitions}
+
+\begin{frame}
+  \frametitle{Partial Information Decomposition~\cite{williams2010nonnegative}}
+  \framesubtitle{Sources-Target Decomposition}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+
+      Given \emph{sources} \source{0}, \source{1}, and a \emph{target} \target, we seek to decompose the information that the sources have about the target:
+      \begin{align*}
+        \I{\source{0}\source{1} : \target} =
+          & \phantom{+}~\Ipart{\source{0}\sep\source{1}}
+          & \textrm{\emph{redundant}} \\
+          & + \Ipart[\target \setminus \source{1}]{\source{0}}
+          & \textrm{\emph{unique with \source{0}}} \\
+          & + \Ipart[\target \setminus \source{0}]{\source{1}}
+          & \textrm{\emph{unique with \source{1}}} \\
+          & + \Ipart{\source{0}\source{1}}
+          & \textrm{\emph{synergistic}}
+        \label{eq:decomp}
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partial Information Decomposition~\cite{williams2010nonnegative}}
+  \framesubtitle{Source-Target Decomposition}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+      Furthermore, each source shares information with the target:
+      \begin{align*}
+        \I{\source{0} : \target} =
+          & \phantom{+}~\Ipart{\source{0}\sep\source{1}}
+          & \textrm{\emph{redundant}} \\
+          & + \Ipart[\target \setminus \source{1}]{\source{0}}
+          & \textrm{\emph{unique with \source{0}}}
+      \end{align*}
+      \begin{align*}
+        \I{\source{1} : \target} =
+          & \phantom{+}~\Ipart{\source{0}\sep\source{1}}
+          & \textrm{\emph{redundant}} \\
+          & + \Ipart[\target \setminus \source{0}]{\source{1}}
+          & \textrm{\emph{unique with \source{1}}}
+      \end{align*}
+      \pause When quantifying unique informations, we require consistency:
+      \begin{align*}
+        \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{Implementations}
+
+\begin{frame}
+  \frametitle{Extant Measures}
+  \framesubtitle{Oh my God, it's full of measures!}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \Large
+      \begin{itemize}
+        \item \Imin[]{}~\cite{williams2010nonnegative}
+        \item \Iproj[]{}~\cite{harder2013bivariate}
+        \item \Ibroja[]{}~\cite{bertschinger2014quantifying,banerjee2017computing}
+        \item \Immi[]{}~\cite{bertschinger2013shared}
+        \item \Iwedge[]{}~\cite{griffith2014intersection}
+        \item \Irr[]{}~\cite{goodwell2017temporal}
+        \item \Iccs[]{}~\cite{ince2017measuring}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \Large
+      \begin{itemize}
+        \item \IRA[]{}~\cite{zwick2004overview}
+        \item \Ipm[]{}~\cite{finn2018pointwise}
+        \item \Idep[]{}~\cite{james2017unique,kay2018exact}
+        \item \Irav[]{}~\cite{dit}
+        \item \IUIi[]{}~\cite{banerjee2018unique}
+        \item \IUIo[]{}~\cite{banerjee2018unique}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Secret Key Agreement Rate}
+
+\subsection{Setup}
+
+\begin{frame}
+  \frametitle{Cryptographic Secrecy~\cite{maurer1993secret}}
+  \framesubtitle{I am a cipher, a cipher wrapped in an enigma, smothered in secret sauce}
+  \large
+  Alice, $A$, and Bob, $B$, wish to agree upon a \emph{secret key}, $K$, despite Eve, $E$, eavesdropping:
+
+  \vspace{1cm}
+
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \begin{description}[Communication:]
+        \item[given:] $n$ samples of $p(a, b, e)$
+        \item[Alice receives:] $A^n$
+        \item[Bob receives:] $B^n$
+        \item[Eve receives:] $E^n$
+        \item[Communication:] $C$
+      \end{description}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \onslide<2->{
+        $S$ is the largest $R$ such that:
+        \begin{align*}
+          K_A &= f(A^n, C) \\
+          K_B &= g(B^n, C) \\
+          p(K_A = K_B = K) &\geq 1 - \epsilon \\
+          \I{K : C E^n} &\leq \epsilon \\
+          \frac{1}{n} \H{K} &\geq R - \epsilon
+        \end{align*}
+      }
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{Punchline}
+
+\begin{frame}
+  \frametitle{Types of Secret Key Agreement Rate}
+  \framesubtitle{You talkin' to me?}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \LARGE
+      \begin{center}
+        \begin{description}[\SKARtwo{A}{B}{E}:]
+          \item[\SKARzero{A}{B}{E}:] no communication
+          \item[\SKARoner{A}{B}{E}:] only Alice communicates
+          \item[\SKARonel{A}{B}{E}:] only Bob communicates
+          \item[\SKARtwo{A}{B}{E}:] both Alice and Bob communicate
+        \end{description}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{Quantifying}
+
+\begin{frame}
+  \frametitle{Computing Secret Key Agreement Rates}
+  \framesubtitle{No Communication}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+      In the case of neither Alice nor Bob communicating~\cite{chitambar2018conditional}:
+      \begin{align*}
+        \SKARzero{A}{B}{E} = \H{A \meet B | E}
+      \end{align*}
+
+      \begin{itemize}
+        \item generally zero
+        \item ``brittle''
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Computing Secret Key Agreement Rates}
+  \framesubtitle{One-Way Communication}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+      When only Alice can communicate~\cite{ahlswede1993common}:
+      \begin{align*}
+        \SKARone{A}{B}{E} = \max_{C \markov K \markov A \markov BE} \I{B : K | C} - \I{E : K | C}
+      \end{align*}
+
+      \begin{itemize}
+        \item $|K| \leq |A|$
+        \item $|C| \leq |A|^2$
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Computing Secret Key Agreement Rates}
+  \framesubtitle{Two-Way Communication}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+      When both Alice and Bob can communicate:
+      \begin{align*}
+        \SKARtwo{A}{B}{E} = \textrm{\textinterrobang}
+      \end{align*}
+
+      However these simple bounds hold:
+      \begin{align*}
+        &\max \left\{ \SKARone{A}{B}{E}, \SKARone{B}{A}{E} \right\} \\
+        &\quad\quad \leq \SKARtwo{A}{B}{E} \leq \\
+        &\quad\quad\quad\quad \I{A : B \downarrow Z} = \min_{p(\overline{z}|z)} \I{A : B | \overline{Z}}
+      \end{align*}
+      and even tighter ones exist~\cite{gohari2017coding}.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Combined}
+
+\subsection{Intuitions}
+
+\begin{frame}
+  \frametitle{\textsc{Pointwise Unique}}
+  \framesubtitle{Properties}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\pntunqdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{1/2}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Pointwise Unique}}
+  \framesubtitle{No Communication}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\pntunqdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARzero{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \SI{1/2}{\bit} \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{0}{\bit}   \\
+        \Ipart{\source{0}\sep\source{1}}                 & \SI{1/2}{\bit} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{1/2}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Pointwise Unique}}
+  \framesubtitle{One-Way Communication: Camel}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\pntunqdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARone{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{1/2}{\bit} \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{1/2}{\bit} \\
+        \Ipart{\source{0}\sep\source{1}}                 & \SI{0}{\bit}   \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{1/2}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Pointwise Unique}}
+  \framesubtitle{One-Way Communication: Elephant}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\pntunqdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARonel{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \SI{1/2}{\bit} \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{0}{\bit}   \\
+        \Ipart{\source{0}\sep\source{1}}                 & \SI{1/2}{\bit} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{1/2}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Pointwise Unique}}
+  \framesubtitle{Two-Way Communication}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\pntunqdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{clr}
+        \multicolumn{2}{c}{\SKARtwo{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{1/2}{\bit} \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{1/2}{\bit} \\
+        \Ipart{\source{0}\sep\source{1}}                 & \SI{0}{\bit}   \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{1/2}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\subsection{Problems}
+
+\begin{frame}
+  \frametitle{\textsc{Problem}}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\probdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{0.3113}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Problem}}
+  \framesubtitle{No Communication}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\probdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARzero{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \xmark       \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{0}{\bit} \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{0}{\bit} \\
+        \Ipart{\source{0}\sep\source{1}}                 & \xmark       \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{0.3113}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Problem}}
+  \framesubtitle{One-Way Communication: Camel}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\probdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARone{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \xmark         \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{1/2}{\bit} \\
+        \Ipart{\source{0}\sep\source{1}}                 & \xmark         \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{0.3113}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Problem}}
+  \framesubtitle{One-Way Communication: Elephant}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\probdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARonel{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \SI{1/2}{\bit} \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & \SI{0}{\bit}   \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{0.1887}{\bit}   \\
+        \Ipart{\source{0}\sep\source{1}}                 & \SI{0.3113}{\bit} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{0.3113}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textsc{Problem}}
+  \framesubtitle{Two-Way Communication}
+  \begin{columns}
+    \begin{column}{0.33\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0) {\probdist};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tabular}{lr}
+        \multicolumn{2}{c}{\SKARtwo{\source{i}}{\target}{\source{j}}} \\
+        \toprule
+        \Ipart{\source{0}\source{1}}                     & \xmark                   \\
+        \Ipart[\target \setminus \source{1}]{\source{0}} & $\leq \SI{0.1887}{\bit}$ \\
+        \Ipart[\target \setminus \source{0}]{\source{1}} & \SI{1/2}{\bit}           \\
+        \Ipart{\source{0}\sep\source{1}}                 & \xmark                   \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+  \end{columns}
+  \begin{align*}
+    \I{\source{0} : \target} = \SI{0.3113}{\bit} \quad \quad \quad \quad \I{\source{1} : \target} = \SI{1/2}{\bit} \\
+    \Ipart[\target \setminus \source{1}]{\source{0}} + \I{\source{1} : \target} = \Ipart[\target \setminus \source{0}]{\source{1}} + \I{\source{0} : \target}
+  \end{align*}
+\end{frame}
+
+\section{Conclusion}
+
+\subsection{Thank You!}
+
+\begin{frame}
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{tcolorbox}[title=Summary]
+        \setlength{\leftmargini}{0.1cm}
+        \setlength{\leftmarginii}{0.25cm}
+        \large
+        \begin{itemize}
+          \item Most proposed PIDs do not have an operational meaning
+          \item Utilizing secret key agreement rate as unique information largely doesn't work:
+          \begin{itemize}
+            \item \SKARzero{\source{i}}{\target}{\source{j}} is inconsistent
+            \item \SKARoner{\source{i}}{\target}{\source{j}} is inconsistent
+            \item \SKARtwo{\source{i}}{\target}{\source{j}} is inconsistent
+            \item \SKARonel{\source{i}}{\target}{\source{j}} mandates elephant thinking
+          \end{itemize}
+        \end{itemize}
+      \end{tcolorbox}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{tcolorbox}[title=Collaborators]
+        \setlength{\leftmargini}{0.25cm}
+        \begin{itemize}
+          \item Jeff Emenheiser
+          \item Jim Crutchfield
+          \item Daniel Feldspar
+        \end{itemize}
+      \end{tcolorbox}
+      \vspace{0.11cm}
+      \begin{tcolorbox}[title=Calculations]
+        All calculations seen here were computed using the \texttt{dit} Python package:
+
+        \vspace{0.25cm}
+        \footnotesize
+        \fullcite{dit}
+      \end{tcolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\appendix
+
+\section{Necessary Communication}
+
+\begin{frame}
+  \frametitle{}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \Large
+
+      \begin{align*}
+        \I{\source{0} | \target | \source{1}} =
+        &\Ipart[\target \setminus \source{1}]{\source{0}}
+        & \textrm{\emph{unique with \source{0}}} \\
+        & + \Ipart{\source{0}\source{1}}
+        & \textrm{\emph{synergistic}}
+      \end{align*}
+      \begin{align*}
+        \I{\source{1} | \target | \source{0}} =
+        &\Ipart[\target \setminus \source{0}]{\source{1}}
+        & \textrm{\emph{unique with \source{1}}} \\
+        & + \Ipart{\source{0}\source{1}}
+        & \textrm{\emph{synergistic}}
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \begin{tikzpicture}
+        \node at (0, 0)   [anchor=north] {\gbdist};
+        \node at (3.5, 0) [anchor=north] {\twowaydist};
+
+        \node at (0, -3.75) {$BEC(p)$};
+        \node (a) at (-1, -4.5) {0};
+        \node (b) at (-1, -6.5) {1};
+        \node (c) at (1, -4.5)  {0};
+        \node (d) at (1, -5.5)  {$\epsilon$};
+        \node (e) at (1, -6.5)  {1};
+
+        \draw [->, >=stealth] (a) -- node[above] {$\pbar$} (c);
+        \draw [->, >=stealth] (a) -- node[below] {$p$}     (d);
+        \draw [->, >=stealth] (b) -- node[above] {$p$}     (d);
+        \draw [->, >=stealth] (b) -- node[below] {$\pbar$} (e);
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \begin{align*}
+        \SKARtwo{\source{0}}{\target}{\source{1}} = \I{\source{0} : \target | \source{1}}
+      \end{align*}
+      \begin{align*}
+        I_3 > 0
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      here lies the dependency decomposition to explain how $I_3$ is part of the cmi.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{\relax \Ibroja[]{}}
+
+\begin{frame}
+  \frametitle{}
+  \framesubtitle{}
+  \begin{columns}
+    \begin{column}{1.0\textwidth}
+      \begin{align*}
+        Q = \left\{ q(\source{0}, \source{1}, \target) : \forall i,~ q(\source{i}, \target) = p(\source{i}, \target) \right\}
+      \end{align*}
+
+    \end{column}
+    \begin{column}{1.0\textwidth}
+      \begin{tikzpicture}
+        \node at (0, 0)   [anchor=north] {\pntunqa};
+        \node at (3.5, 0) [anchor=north] {\pntunqb};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\end{document}

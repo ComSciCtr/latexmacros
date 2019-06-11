@@ -1,0 +1,577 @@
+\documentclass[final,serif,hyperref={pdfpagelabels=false}]{beamer}
+\usepackage{dynlearn}
+\usepackage[orientation=landscape,size=a0,scale=1.4]{beamerposter}
+\mode <presentation>
+{
+    \usetheme{dynlearn}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibligraphy setup
+\addbibresource{ite.bib}
+\renewcommand*{\bibfont}{\footnotesize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% document setup
+
+\input{ite_defs}
+
+\newcommand{\intrinsic}{\textcolor{id}{\textbf{\vphantom{gh}intrinsic}}\xspace}
+\newcommand{\shared}{\textcolor{sd}{\textbf{\vphantom{gh}shared}}\xspace}
+\newcommand{\synergistic}{\textcolor{cd}{\textbf{\vphantom{gh}synergistic}}\xspace}
+\newcommand{\Intrinsic}{\textcolor{id}{\textbf{\vphantom{gh}Intrinsic}}\xspace}
+\newcommand{\Shared}{\textcolor{sd}{\textbf{\vphantom{gh}Shared}}\xspace}
+\newcommand{\Synergistic}{\textcolor{cd}{\textbf{\vphantom{gh}Synergistic}}\xspace}
+
+\newcommand{\Xpast}{\ensuremath{X_{-1}}\xspace}
+\newcommand{\Ypast}{\ensuremath{Y_{-1}}\xspace}
+\newcommand{\Ypres}{\ensuremath{Y_{0}}\xspace}
+
+\newcommand{\SKAR}{\ensuremath{S(X : Y ~||~ Z)}\xspace}
+\renewcommand{\TDMI}{\I{\Xpast : \Ypres}\xspace}
+\renewcommand{\TE}{\I{\Xpast : \Ypres \mid \Ypast}\xspace}
+\renewcommand{\ITE}{\I{\Xpast : \Ypres \downarrow \Ypast}\xspace}
+
+\newcommand{\sepa}{0.25cm}
+\newcommand{\sepb}{1.35cm}
+\newcommand{\sepc}{0.40cm}
+\newcommand{\sepd}{0.33cm}
+
+\pgfplotsset{
+  table/col sep=comma,
+}
+
+\pgfplotstableread{data/stock_data.csv}{\stockdata}
+\pgfplotstableread{data/ipd_data.csv}{\ipddata}
+
+\title{Modes of Information Flow}
+\author{Ryan G. James (\href{mailto:rgjames@ucdavis.edu}{\url{rgjames@ucdavis.edu}}), Bahti Zakirov (\href{mailto:bahtiyr.zakirov@macaulay.cuny.edu}{\url{bahtiyr.zakirov@macaulay.cuny.edu}}), Blanca Daniella Masante Ayala, James P. Crutchfield}
+\def\presenter{Ryan G. James, Bahti Zakirov, Dany Masante}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+\begin{document}
+
+\begin{frame}[fragile]{}
+
+\noindent
+\begin{columns}[T]
+  \begin{column}{.32\paperwidth}
+
+    \begin{tcolorbox}[title=Background]
+      Determining the information flow between two time series is fundamental to understanding a complex system's intrinsic dynamics. Efforts thus far assume the information that flows is a unitary quantity. In contrast, we demonstrate that information flow between two time series takes on three distinct qualitative modes: \intrinsic, \shared, and \synergistic. These modes cannot be directly quantified by existing Shannon information measures. However, invoking a cryptographic hypothesis---a duality between \intrinsic flow and cryptographic secrecy---we can decompose flows between any pair of time series into these modes.
+    \end{tcolorbox}
+
+    \vspace{\sepa}
+
+    \begin{tcolorbox}[title=Canonical Exemplars of Flow Modes]
+      \begin{center}
+        \begin{tikzpicture}[every node/.style={transform shape}, scale=2.25]
+          \begin{scope}
+            \node at (0.75, 2.5) {\small\intrinsic};
+            \node at (0.0, 1.50) {X};
+            \node at (1.5, 1.50) {Y};
+            \draw [line width=1.5mm] (-0.5, 0.75) -- (2.0, 0.75);
+
+            \node [inner sep=1mm] (nal) at (0.0, -00.00) {0};
+            \node [inner sep=1mm] (nar) at (1.5, -00.00) {1};
+            \node [inner sep=1mm] (nbl) at (0.0, -01.50) {0};
+            \node [inner sep=1mm] (nbr) at (1.5, -01.50) {0};
+            \node [inner sep=1mm] (ncl) at (0.0, -03.00) {1};
+            \node [inner sep=1mm] (ncr) at (1.5, -03.00) {0};
+            \node [inner sep=1mm] (ndl) at (0.0, -04.50) {1};
+            \node [inner sep=1mm] (ndr) at (1.5, -04.50) {1};
+            \node [inner sep=1mm] (nel) at (0.0, -06.00) {0};
+            \node [inner sep=1mm] (ner) at (1.5, -06.00) {1};
+            \node [inner sep=1mm] (nfl) at (0.0, -07.50) {0};
+            \node [inner sep=1mm] (nfr) at (1.5, -07.50) {0};
+            \node [inner sep=1mm] (ngl) at (0.0, -09.00) {1};
+            \node [inner sep=1mm] (ngr) at (1.5, -09.00) {0};
+            % \node [inner sep=1mm] (nhl) at (0.0, -10.50) {0};
+            % \node [inner sep=1mm] (nhr) at (1.5, -10.50) {1};
+
+            \draw [>=stealth, line width=3mm, ->, color=id] (nal) -- (nbr);
+            \draw [>=stealth, line width=3mm, ->, color=id] (nbl) -- (ncr);
+            \draw [>=stealth, line width=3mm, ->, color=id] (ncl) -- (ndr);
+            \draw [>=stealth, line width=3mm, ->, color=id] (ndl) -- (ner);
+            \draw [>=stealth, line width=3mm, ->, color=id] (nel) -- (nfr);
+            \draw [>=stealth, line width=3mm, ->, color=id] (nfl) -- (ngr);
+            % \draw [>=stealth, line width=3mm, ->, color=id] (ngl) -- (nhr);
+          \end{scope}
+
+          \begin{scope}[shift={(5.0, 0)}]
+            \node at (0.75, 2.5) {\small\shared};
+            \node at (0.0, 1.50) {X};
+            \node at (1.5, 1.50) {Y};
+            \draw [line width=1.5mm] (-0.5, 0.75) -- (2.0, 0.75);
+
+            \node [inner sep=1mm] (nal) at (0.0, -00.00) {0};
+            \node [inner sep=1mm] (nar) at (1.5, -00.00) {0};
+            \node [inner sep=1mm] (nbl) at (0.0, -01.50) {1};
+            \node [inner sep=1mm] (nbr) at (1.5, -01.50) {1};
+            \node [inner sep=1mm] (ncl) at (0.0, -03.00) {0};
+            \node [inner sep=1mm] (ncr) at (1.5, -03.00) {0};
+            \node [inner sep=1mm] (ndl) at (0.0, -04.50) {1};
+            \node [inner sep=1mm] (ndr) at (1.5, -04.50) {1};
+            \node [inner sep=1mm] (nel) at (0.0, -06.00) {0};
+            \node [inner sep=1mm] (ner) at (1.5, -06.00) {0};
+            \node [inner sep=1mm] (nfl) at (0.0, -07.50) {1};
+            \node [inner sep=1mm] (nfr) at (1.5, -07.50) {1};
+            \node [inner sep=1mm] (ngl) at (0.0, -09.00) {0};
+            \node [inner sep=1mm] (ngr) at (1.5, -09.00) {0};
+            % \node [inner sep=1mm] (nhl) at (0.0, -10.50) {1};
+            % \node [inner sep=1mm] (nhr) at (1.5, -10.50) {1};
+
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nal) -- (nbr);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nbl) -- (ncr);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (ncl) -- (ndr);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (ndl) -- (ner);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nel) -- (nfr);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nfl) -- (ngr);
+            % \draw [>=stealth, line width=3mm, ->, color=sd] (ngl) -- (nhr);
+
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nar.east) to [out=315, in=45] (nbr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nbr.east) to [out=315, in=45] (ncr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (ncr.east) to [out=315, in=45] (ndr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (ndr.east) to [out=315, in=45] (ner.north east);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (ner.east) to [out=315, in=45] (nfr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=sd] (nfr.east) to [out=315, in=45] (ngr.north east);
+            % \draw [>=stealth, line width=3mm, ->, color=sd] (ngr.east) to [out=315, in=45] (nhr.north east);
+          \end{scope}
+
+          \begin{scope}[shift={(10.0, 0)}]
+            \node at (0.75, 2.5) {\small\synergistic};
+            \node at (0.0, 1.5) {X};
+            \node at (1.5, 1.5) {Y};
+            \draw [line width=1.5mm] (-0.5, 0.75) -- (2.0, 0.75);
+
+            \node [inner sep=1mm] (nal) at (0.0, -00.00) {0};
+            \node [inner sep=1mm] (nar) at (1.5, -00.00) {1};
+            \node [inner sep=1mm] (nbl) at (0.0, -01.50) {1};
+            \node [inner sep=1mm] (nbr) at (1.5, -01.50) {1};
+            \node [inner sep=1mm] (ncl) at (0.0, -03.00) {1};
+            \node [inner sep=1mm] (ncr) at (1.5, -03.00) {0};
+            \node [inner sep=1mm] (ndl) at (0.0, -04.50) {1};
+            \node [inner sep=1mm] (ndr) at (1.5, -04.50) {1};
+            \node [inner sep=1mm] (nel) at (0.0, -06.00) {0};
+            \node [inner sep=1mm] (ner) at (1.5, -06.00) {0};
+            \node [inner sep=1mm] (nfl) at (0.0, -07.50) {1};
+            \node [inner sep=1mm] (nfr) at (1.5, -07.50) {0};
+            \node [inner sep=1mm] (ngl) at (0.0, -09.00) {1};
+            \node [inner sep=1mm] (ngr) at (1.5, -09.00) {1};
+            % \node [inner sep=1mm] (nhl) at (0.0, -10.50) {0};
+            % \node [inner sep=1mm] (nhr) at (1.5, -10.50) {0};
+
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (nal.north west) rectangle (nar.south east);
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (nbl.north west) rectangle (nbr.south east);
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (ncl.north west) rectangle (ncr.south east);
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (ndl.north west) rectangle (ndr.south east);
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (nel.north west) rectangle (ner.south east);
+            \draw [line width=2mm, rounded corners=3mm, color=cd] (nfl.north west) rectangle (nfr.south east);
+            % \draw [line width=2mm, rounded corners=3mm, color=cd] (ngl.north west) rectangle (ngr.south east);
+
+            \draw [>=stealth, line width=3mm, ->, color=cd] (nar.east) to [out=315, in=45] (nbr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=cd] (nbr.east) to [out=315, in=45] (ncr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=cd] (ncr.east) to [out=315, in=45] (ndr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=cd] (ndr.east) to [out=315, in=45] (ner.north east);
+            \draw [>=stealth, line width=3mm, ->, color=cd] (ner.east) to [out=315, in=45] (nfr.north east);
+            \draw [>=stealth, line width=3mm, ->, color=cd] (nfr.east) to [out=315, in=45] (ngr.north east);
+            % \draw [>=stealth, line width=3mm, ->, color=cd] (ngr.east) to [out=315, in=45] (nhr.north east);
+          \end{scope}
+        \end{tikzpicture}
+      \end{center}
+
+      \begin{description}[\synergistic:]
+        \item[\intrinsic:] \Xpast is predictive of \Ypres in a way that \Ypast is not
+        \item[\shared:] \Xpast is predictive of \Ypres in the same way that \Ypast is
+        \item[\synergistic:] neither \Xpast nor \Ypast are predictive of \Ypres while the pair \Xpast, \Ypast is
+      \end{description}
+    \end{tcolorbox}
+
+    \vspace{\sepa}
+
+    \begin{tcolorbox}[title=Relationship to Extant Measures]
+      Two common methods of quantifying information flow are the \emph{time-delayed mutual information}~\cite{kantz2004nonlinear} and the \emph{transfer entropy}~\cite{schreiber2000measuring}:
+
+      \begin{description}[\hspace{5cm}Time-Delayed Mutual Information:]
+        \item[Time-Delayed Mutual Information:] \TDMI
+        \item[Transfer Entropy:] \TE
+      \end{description}
+
+      The time-delayed mutual information aggregates both \intrinsic and \shared information flows, while the transfer entropy aggregates \intrinsic and \synergistic information flows. Transfer entropy conditions on \Ypast in order to excise the \shared flow, but doing so induces the \synergistic flow.
+
+    \end{tcolorbox}
+
+  \end{column}
+
+  \begin{column}{.32\paperwidth}
+
+    \begin{tcolorbox}[title=Intrinsic Flow as Cryptographic Secrecy]
+      \Intrinsic flow is best characterized as information predictive of \Ypres which is present in \Xpast but no other part of the system. Analogously, consider cryptographic communication in which Alice ($X$) and Bob ($Y$) attempt to agree on a secret key in the presence of an eavesdropper Eve ($Z$). The rate at which they can do so is given by \SKAR, the \emph{secret key agreement rate}~\cite{maurer1993secret}. We assert that the two are equivalent: if \Ypres contains information which can be solely attributed to \Xpast, and not \Ypast, then \Ypres and \Xpast should be able to utilize that information to agree upon a secret inaccessible to \Ypast.
+
+      Generally, there is no closed-form expression for \SKAR. In this work we utilize the relatively easily computed upper bound, the \emph{intrinsic mutual information}~\cite{maurer1999unconditionally}:
+      \begin{align*}
+        \I{X : Y \downarrow Z} = \min_{p(\bar{z}|z)} \I{X : Y \mid \bar{Z}}
+      \end{align*}
+      That is, the amount of information shared by $X$ and $Y$ and inaccessible to $Z$ is the least amount of information they share given any possible corruption --- $p(\bar{z}|z)$ --- of $Z$. We now define \intrinsic flow from $X$ to $Y$:
+
+      \begin{description}[\hspace{10cm}Intrinsic Flow:]
+        \item[Intrinsic Flow:] \ITE
+      \end{description}
+
+      Note that \intrinsic flow is bound from above by both the time-delayed mutual information (where $p(\bar{z}|z)$ is a constant) and the transfer entropy (where $p(\bar{z}|z)$ is the identity).
+    \end{tcolorbox}
+
+    \vspace{\sepb}
+
+    \begin{tcolorbox}[title=Measures Applied to Canonical Flows]
+
+      \begin{center}
+        \begin{tikzpicture}[every node/.style={transform shape}, scale=1.0]
+
+          \node [inner sep=0] (distcd) at (0, 0) [anchor=west] {
+            \begin{tabular}{cccc}
+              \multicolumn{4}{c}{\intrinsic} \\
+              \toprule
+              \Xpast & \Ypres & \Ypast & $\Pr$ \\
+              \midrule
+              \textcolor{id}{0} & \textcolor{id}{0} & \textcolor{id}{0} & $\nicefrac{1}{4}$ \\
+              \textcolor{id}{0} & \textcolor{id}{0} & \textcolor{id}{1} & $\nicefrac{1}{4}$ \\
+              \textcolor{id}{1} & \textcolor{id}{1} & \textcolor{id}{0} & $\nicefrac{1}{4}$ \\
+              \textcolor{id}{1} & \textcolor{id}{1} & \textcolor{id}{1} & $\nicefrac{1}{4}$ \\
+              \bottomrule
+            \end{tabular}
+          };
+          \node [inner sep=0] (distsd) at ($ (distcd.north east) + (3.5, 0) $) [anchor=north west] {
+            \begin{tabular}{cccc}
+              \multicolumn{4}{c}{\shared} \\
+              \toprule
+              \Xpast & \Ypres & \Ypast & $\Pr$ \\
+              \midrule
+              \textcolor{sd}{0} & \textcolor{sd}{1} & \textcolor{sd}{0} & $\nicefrac{1}{2}$ \\
+              \textcolor{sd}{1} & \textcolor{sd}{0} & \textcolor{sd}{1} & $\nicefrac{1}{2}$ \\
+              \bottomrule
+            \end{tabular}
+          };
+          \node [inner sep=0] (distid) at ($ (distsd.north east) + (3.5, 0) $) [anchor=north west] {
+            \begin{tabular}{cccc}
+              \multicolumn{4}{c}{\synergistic} \\
+              \toprule
+              \Xpast & \Ypres & \Ypast & $\Pr$ \\
+              \midrule
+              \textcolor{cd}{0} & \textcolor{cd}{0} & \textcolor{cd}{0} & $\nicefrac{1}{4}$ \\
+              \textcolor{cd}{0} & \textcolor{cd}{1} & \textcolor{cd}{1} & $\nicefrac{1}{4}$ \\
+              \textcolor{cd}{1} & \textcolor{cd}{0} & \textcolor{cd}{1} & $\nicefrac{1}{4}$ \\
+              \textcolor{cd}{1} & \textcolor{cd}{1} & \textcolor{cd}{0} & $\nicefrac{1}{4}$ \\
+              \bottomrule
+            \end{tabular}
+          };
+
+          \node [inner sep=0] (eqscd) at ($(distcd.north) + (0, -10)$) [anchor=north] {
+            \begin{minipage}{0.4\columnwidth}
+              \small
+              \begin{align*}
+                \TDMI &= \textcolor{id}{1} \\
+                \TE &= \textcolor{id}{1} \\
+                \ITE &= \textcolor{id}{1}
+              \end{align*}
+            \end{minipage}
+          };
+          \node [inner sep=0] (eqssd) at ($(distsd.north) + (0, -10)$) [anchor=north] {
+            \begin{minipage}{0.4\columnwidth}
+              \small
+              \begin{align*}
+                \TDMI &= \textcolor{sd}{1} \\
+                \TE &= \textcolor{sd}{0} \\
+                \ITE &= \textcolor{sd}{0}
+              \end{align*}
+            \end{minipage}
+          };
+          \node [inner sep=0] (eqsid) at ($(distid.north) + (0, -10)$) [anchor=north] {
+            \begin{minipage}{0.4\columnwidth}
+              \small
+              \begin{align*}
+                \TDMI &= \textcolor{cd}{0} \\
+                \TE &= \textcolor{cd}{1} \\
+                \ITE &= \textcolor{cd}{0}
+              \end{align*}
+            \end{minipage}
+          };
+        \end{tikzpicture}
+      \end{center}
+
+      Time-delayed mutual information is \SI{1}{\bit} for both the \intrinsic and \shared exemplars. Transfer entropy is \SI{1}{\bit} for both the \intrinsic and \synergistic exemplars. Intrinsic flow is \SI{1}{\bit} only for the \intrinsic exemplar.
+
+    \end{tcolorbox}
+
+    \vspace{\sepb}
+
+    \begin{tcolorbox}[title=Decomposition Into Modes]
+
+      Using the time-delayed mutual information, the transfer entropy, and the intrinsic flow, we decompose any time series into its three modes:
+
+      \begin{center}
+        \begin{description}[\hspace{5cm}\synergistic:]
+          \item[\intrinsic:] \ITE
+          \item[\shared:] $\TDMI - \ITE$
+          \item[\synergistic:] $\TE - \ITE$
+        \end{description}
+      \end{center}
+
+    \end{tcolorbox}
+
+  \end{column}
+
+  \begin{column}{.32\paperwidth}
+
+    \begin{tcolorbox}[title=Information Flow Examples]
+
+      \begin{tcolorbox}[title=~S\&P 500, arc=3mm, bottomtitle=3mm, toptitle=3mm, colframe=ucdblue!65!white, fonttitle=\bfseries]
+        \centering
+        Information flow between the S\&P 500 and its constituent stocks
+        \begin{columns}[T]
+          \pgfplotsset{
+            every tick label/.append style={font=\tiny},
+            major grid style={dotted,gray},
+            minor grid style={dotted,gray},
+            every axis/.append style={
+              xlabel=stock $\to$ index,
+              ylabel=index $\to$ stock,
+              title style={font=\small, yshift=-1.0ex},
+              label style={font=\small},
+              xlabel style={yshift=0.6ex},
+              ylabel style={yshift=0-.50ex},
+              xmin=-0.0002,
+              xmax=0.012544459112331763,
+              ymin=-0.0002,
+              ymax=0.012544459112331763,
+              height=\textwidth,
+              width=\textwidth,
+            },
+            ticks=none,
+            xticklabels=\empty,
+            yticklabels=\empty,
+            grid=both,
+            myscatter/.style={
+              scatter,
+              only marks,
+            },
+          }%
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\intrinsic]
+                \addplot [myscatter, scatter/use mapped color={draw=id, fill=id}] table [x=si_i, y=is_i] {\stockdata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              Stock is highly predictive of index, but index is not particularly predictive of stock
+            \end{tcolorbox}
+          \end{column}
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\shared]
+                \addplot [myscatter, scatter/use mapped color={draw=sd, fill=sd}] table [x=si_s, y=is_s] {\stockdata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              Either stock or index is mildly predictive of either stock or index, but slightly better at index
+            \end{tcolorbox}
+          \end{column}
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\synergistic]
+                \addplot [myscatter, scatter/use mapped color={draw=cd, fill=cd}] table [x=si_c, y=is_c] {\stockdata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              Index is best predicted using both stock and index, at least for some stocks
+            \end{tcolorbox}
+          \end{column}
+        \end{columns}
+      \end{tcolorbox}
+
+      \vspace{\sepd}
+
+      % \begin{tcolorbox}[title=~Yeast Fission Cycle, arc=3mm, bottomtitle=3mm, toptitle=3mm, colframe=ucdblue!65!white]
+      %   \vspace{10cm}
+      % \end{tcolorbox}
+      %
+      % \vspace{\sepd}
+
+      \begin{tcolorbox}[title=Iterated Prisoners Dilemma, arc=3mm, bottomtitle=3mm, toptitle=3mm, colframe=ucdblue!65!white, fonttitle=\bfseries]
+        \centering
+        Information flow in Axelrod's original tournament
+        \begin{columns}[t]
+          \pgfplotsset{
+            ticks=none,
+            xticklabels=\empty,
+            yticklabels=\empty,
+            every axis/.append style={
+              height=\textwidth,
+              width=\textwidth,
+              xlabel={strategy 1},
+              ylabel={strategy 2},
+              title style={font=\small, yshift=-1.0ex},
+              label style={font=\small},
+              xlabel style={yshift=0.6ex},
+              ylabel style={yshift=-0.6ex},
+              xmin=-0.55,
+              xmax=13.55,
+              ymin=-0.55,
+              ymax=13.55,
+            },
+            mymatrix/.style={
+              matrix plot*,
+              mesh/cols=14,
+              point meta=explicit,
+            },
+          }%
+          \hspace{-0.5cm}
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\intrinsic]
+                \addplot [mymatrix, colormap/Reds] table [x=s1, y=s2, meta=intrinsic] {\ipddata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              Strategies Tit For Tat, Stein \& Rapoport, and Joss respond directly from their opponent's behavior
+            \end{tcolorbox}
+          \end{column}
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\shared]
+                \addplot [mymatrix, colormap/Greens] table [x=s1, y=s2, meta=shared] {\ipddata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              Matches of Tideman \& Chieruzzi against either Tit For Tat or Stein \& Rapoport tend to synchronize
+            \end{tcolorbox}
+          \end{column}
+          \begin{column}{0.33\textwidth}
+            \begin{tikzpicture}
+              \begin{axis}[title=\synergistic]
+                \addplot [mymatrix, colormap/Blues] table [x=s1, y=s2, meta=synergistic] {\ipddata};
+              \end{axis}
+            \end{tikzpicture}
+            \begin{tcolorbox}[fontupper=\small,
+                              width=0.99\textwidth,
+                              flushleft upper,
+                              frame empty,
+                              boxrule=0pt,
+                              arc=0pt,
+                              left=0.5cm,
+                              right=0.5cm,
+                              after=\ignorespacesafterend\par\noindent
+                             ]
+              The behavior of Grofman can often be inferred given the history of both players
+            \end{tcolorbox}
+          \end{column}
+        \end{columns}
+      \end{tcolorbox}
+
+      \vspace{\sepd}
+
+      \begin{tcolorbox}[title=Hyperchaos, arc=3mm, bottomtitle=3mm, toptitle=3mm, colframe=ucdblue!65!white, fonttitle=\bfseries]
+        \begin{columns}
+          \begin{column}{0.4\textwidth}
+            \begin{align*}
+              \dot{x} &= (25 - 10a)(y - x) \\
+              \dot{y} &= (\frac{35}{2}a + \frac{21}{2})x -xz\\
+                      &\quad\quad + (13.3 - 14a)y \\
+              \dot{z} &= xy - \frac{8}{3}z \\
+              a &= \cos(\omega t)
+            \end{align*}
+          \end{column}
+          \begin{column}{0.6\textwidth}
+            \centering
+            \begin{tikzpicture}[every node/.style={transform shape}, scale=1.0, style=vaucanson]
+              \node [state] (x) at (90:5cm) {$x$};
+              \node [state] (y) at (210:5cm) {$y$};
+              \node [state] (z) at (330:5cm) {$z$};
+
+              \draw [>=stealth, ->, color=id, line width=0.19381333647928353mm] (x) to [out=185, in=115] (y);
+              \draw [>=stealth, ->, color=sd, line width=3.41520558074802mm] (x) to [out=200, in=100] (y);
+              % \draw [>=stealth, ->, color=cd, line width=0.0mm] (x) to [out=215, in=85] (y);
+              \draw [>=stealth, ->, color=id, line width=2.016186574958467mm] (y) to [out=40, in=260] (x);
+              \draw [>=stealth, ->, color=sd, line width=5.0mm] (y) to [out=55, in=245] (x);
+              % \draw [>=stealth, ->, color=cd, line width=0.000000000000005152881520766581mm] (y) to [out=70, in=230] (x);
+
+              % \draw [>=stealth, ->, color=id, line width=0.07485604911924425mm] (y) to [out=305, in=235] (z);
+              \draw [>=stealth, ->, color=sd, line width=0.2657679883458439mm] (y) to [out=320, in=220] (z);
+              \draw [>=stealth, ->, color=cd, line width=0.4096772920789646mm] (y) to [out=335, in=205] (z);
+              % \draw [>=stealth, ->, color=id, line width=0.0027969469515872654mm] (z) to [out=160, in=380] (y);
+              % \draw [>=stealth, ->, color=sd, line width=0.0002762130184555059mm] (z) to [out=175, in=365] (y);
+              \draw [>=stealth, ->, color=cd, line width=2.053348841974773mm] (z) to [out=190, in=350] (y);
+
+              % \draw [>=stealth, ->, color=id, line width=0.002947819608726827mm] (z) to [out=425, in=355] (x);
+              % \draw [>=stealth, ->, color=sd, line width=0.0003841449962553464mm] (z) to [out=440, in=340] (x);
+              \draw [>=stealth, ->, color=cd, line width=1.7420670782595773mm] (z) to [out=455, in=325] (x);
+              \draw [>=stealth, ->, color=id, line width=0.1415881859309736mm] (x) to [out=280, in=500] (z);
+              \draw [>=stealth, ->, color=sd, line width=0.23443289801685793mm] (x) to [out=295, in=485] (z);
+              \draw [>=stealth, ->, color=cd, line width=0.3586127004317282mm] (x) to [out=310, in=470] (z);
+            \end{tikzpicture}
+          \end{column}
+        \end{columns}
+      \end{tcolorbox}
+
+    \end{tcolorbox}
+
+    \vspace{\sepc}
+
+    \begin{tcolorbox}[title=References]
+      \printbibliography[heading=none]
+    \end{tcolorbox}
+
+  \end{column}
+
+\end{columns}
+
+\end{frame}
+
+\end{document}
